@@ -28,8 +28,8 @@ After pulling it from docker hub, you can then run jupyter notebook in the conta
 
 ```
 docker run -it --rm --cpus=5 \
--v /home/hcp4715/Data_Analysis/HDDM:/home/jovyan/hddm \
--p 8888:8888 hcp4715/ddm:tutorial_v1 jupyter notebook
+-v /home/media/hcp4715/study/Exp_Modeling/DDM/tutorial:/home/jovyan/tutorial \
+-p 8888:8888 hcp4715/hddm:example jupyter notebook
 ```
 
 `docker run` ---- run a docker image in a container
