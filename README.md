@@ -1,7 +1,7 @@
-# A hitchhiker's guide to sequential sampling models
+# Ten Simple Steps for Principled Bayesian Hierarchical Drift-Diffusion Modelling with HDDM
 
-## What is sequential sampling? 
-Sequential sampling is ....
+## What is HDDM? 
+A python package for hierachical drift-diffusion models.
 
 This docker image included XX major toolbox for sequential sampling modeling, including:
 * HDDM is a python package for hierarchical drift diffusion modelling, see [here](http://ski.clps.brown.edu/hddm_docs/index.html) for more.
@@ -9,9 +9,9 @@ This docker image included XX major toolbox for sequential sampling modeling, in
 * ...
 
 ## Why we write this guide
-1. Sequential sampling models is an influential model, used widely in different fields
-2. Sequential sampling models has become a complex cluster of models, 
-3. The packages can be used for different models are not straightforward.
+1. HDDM is an influential package for DDM, which is an class of models that used widely in different fields
+2. HDDM' tutorial is outdated 
+3. User's forum had accumulated some common issues that trouble beginners.
 
 ## How to use this guide
 
