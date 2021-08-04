@@ -1,0 +1,21 @@
+Supplemental Table 4. Demographic information for participants in the ON/OFF stimulation study. 
+
+UPDRS: United Parkinson’s Disease Rating Scale; 
+ED= Education; 
+NAART=North American Adult Reading Test; 
+MMSE=Mini Mental State Exam; 
+Voltage and frequencies of stimulation on right (R) and left (L) STN
+
+Meds:
+1=Carbidopa / Levodopa
+2=D2 Agonist
+3=1+2+Persisting Med
+4=Other
+
+Ed:
+1=HS or GED
+2=Some College
+3=Bachelor's
+4=Higher Ed (Master's +)
+
+
