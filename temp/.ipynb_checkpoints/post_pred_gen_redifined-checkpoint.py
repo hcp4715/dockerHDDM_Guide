@@ -15,16 +15,44 @@ def _parents_to_random_posterior_sample(bottom_node, pos=None):
         parent.value = parent.trace()[pos]
 
 # https://github.com/hddm-devs/kabuki/blob/master/kabuki/analyze.py#L271
-def _post_pred_generate(bottom_node, samples=500, data=None, append_data=False):
+def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False):
     """Generate posterior predictive data from a single observed node."""
+    import pymc as pm
+    import numpy as np
+    
     datasets = []
 
     ##############################
     # Sample and generate stats
+    # If number of samples is fixed, use the original code, i.e., randomly sample one set of
+    # values from extended_parents and generate random value;
+    #
+    # If number of samples is None, use the lenght of trace
+
+    for i, parent in enumerate(bottom_node.extended_parents):
+        if not isinstance(parent, pm.Node): # Skip non-stochastic nodes
+            continue
+        else:
+            mc_len = len(parent.trace())
+            break
+    
+    if not sample:
+            samples = mc_len
+            print("Number of samples is equal to length of MCMC trace.")
+
+    assert samples, "Can not determine the number of samples"
+    
     for sample in range(samples):
-        _parents_to_random_posterior_sample(bottom_node)
+        
+        if sample == mc_len:
+            _parents_to_random_posterior_sample(bottom_node, pos = sample)
+        else:
+            pos = np.random.randint(0, mc_len)
+            _parents_to_random_posterior_sample(bottom_node, pos = pos)
+
         # Generate data from bottom node
         sampled_data = bottom_node.random()
+
         if append_data and data is not None:
             sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
         datasets.append(sampled_data)
@@ -32,7 +60,7 @@ def _post_pred_generate(bottom_node, samples=500, data=None, append_data=False):
     return datasets
 
 # https://github.com/hddm-devs/kabuki/blob/master/kabuki/analyze.py#L287
-def post_pred_gen(model, groupby=None, samples=500, append_data=False, progress_bar=True):
+def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress_bar=True):
     """Run posterior predictive check on a model.
     :Arguments:
         model : kabuki.Hierarchical
@@ -89,6 +117,7 @@ def post_pred_gen(model, groupby=None, samples=500, append_data=False, progress_
         # Sample and generate stats
         datasets = _post_pred_generate(node, samples=samples, data=data, append_data=append_data)
         results[name] = pd.concat(datasets, names=['sample'], keys=list(range(len(datasets))))
+            
 
     if progress_bar:
         bar_iter += 1
