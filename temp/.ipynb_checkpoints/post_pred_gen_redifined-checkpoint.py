@@ -4,12 +4,12 @@ def _parents_to_random_posterior_sample(bottom_node, pos=None):
     import pymc as pm
     import numpy as np
     for i, parent in enumerate(bottom_node.extended_parents):
-        if not isinstance(parent, pm.Node): # Skip non-stochastic nodes
-            continue
+#         if not isinstance(parent, pm.Node): # Skip non-stochastic nodes
+#             continue
 
-        if pos is None:
-            # Set to random posterior position
-            pos = np.random.randint(0, len(parent.trace()))
+#         if pos is None:
+#             # Set to random posterior position
+#             pos = np.random.randint(0, len(parent.trace()))
 
         assert len(parent.trace()) >= pos, "pos larger than posterior sample size"
         parent.value = parent.trace()[pos]
@@ -27,7 +27,7 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     # If number of samples is fixed, use the original code, i.e., randomly sample one set of
     # values from extended_parents and generate random value;
     #
-    # If number of samples is None, use the lenght of trace
+    # If number of samples is None, use the lenght of trace, and iterate the whole posterior.
 
     for i, parent in enumerate(bottom_node.extended_parents):
         if not isinstance(parent, pm.Node): # Skip non-stochastic nodes
@@ -35,27 +35,35 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
         else:
             mc_len = len(parent.trace())
             break
-    
-    if not sample:
+    # samples=samples
+    if samples is None:
             samples = mc_len
             print("Number of samples is equal to length of MCMC trace.")
 
     assert samples, "Can not determine the number of samples"
     
-    for sample in range(samples):
-        
-        if sample == mc_len:
+    if samples == mc_len:
+        for sample in range(samples):
             _parents_to_random_posterior_sample(bottom_node, pos = sample)
-        else:
+            
+            # Generate data from bottom node
+            sampled_data = bottom_node.random()
+            
+            if append_data and data is not None:
+                sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
+            datasets.append(sampled_data)
+    
+    else:
+        for sample in range(samples):
             pos = np.random.randint(0, mc_len)
             _parents_to_random_posterior_sample(bottom_node, pos = pos)
 
-        # Generate data from bottom node
-        sampled_data = bottom_node.random()
+            # Generate data from bottom node
+            sampled_data = bottom_node.random()
 
-        if append_data and data is not None:
-            sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
-        datasets.append(sampled_data)
+            if append_data and data is not None:
+                sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
+            datasets.append(sampled_data)
 
     return datasets
 
@@ -67,7 +75,7 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
             Kabuki model over which to compute the ppc on.
     :Optional:
         samples : int
-            How many samples to generate for each node.
+            How many samples to generate for each node. If None, will used the MCMC samples
 
         groupby : list
             Alternative grouping of the data. If not supplied, uses splitting
@@ -79,8 +87,8 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
     :Returns:
         Hierarchical pandas.DataFrame with multiple sampled RT data sets.
         1st level: wfpt node
-        2nd level: posterior predictive sample
-        3rd level: original data index
+        2nd level: draw, i.e., draw of MCMC or samples of posterior predictive.
+        3rd level: original data index (row_idx)
     :See also:
         post_pred_stats
     """
@@ -116,7 +124,7 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
         ##############################
         # Sample and generate stats
         datasets = _post_pred_generate(node, samples=samples, data=data, append_data=append_data)
-        results[name] = pd.concat(datasets, names=['sample'], keys=list(range(len(datasets))))
+        results[name] = pd.concat(datasets, names=['draw'], keys=list(range(len(datasets))))
             
 
     if progress_bar:
