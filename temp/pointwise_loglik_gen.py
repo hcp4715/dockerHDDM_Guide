@@ -12,6 +12,7 @@ def _pointwise_like_generate(bottom_node, samples=None, data=None, append_data=F
     """Generate posterior predictive data from a single observed node."""
     import pymc as pm
     import numpy as np
+    import pandas as pd
     from copy import deepcopy
     import hddm
     
@@ -28,8 +29,8 @@ def _pointwise_like_generate(bottom_node, samples=None, data=None, append_data=F
             break
     # samples=samples
     if samples is None:
-            samples = mc_len
-            print("Number of samples is equal to length of MCMC trace.")
+        samples = mc_len
+        # print("Number of samples is equal to length of MCMC trace.")
 
     assert samples, "Can not determine the number of samples"
     
@@ -37,29 +38,71 @@ def _pointwise_like_generate(bottom_node, samples=None, data=None, append_data=F
         _parents_to_random_posterior_sample(bottom_node, pos = sample)
         
         param_dict = deepcopy(bottom_node.parents.value)
-        if param_dict['reg_outcomes']:
+        
+        # for regressor models
+        if 'reg_outcomes' in param_dict:
             del param_dict['reg_outcomes']
 
-        pointwise_lik = bottom_node.value.copy()
-        pointwise_lik.index.names = ['row_idx']        # change the index label as "row_idx"
-        pointwise_lik.drop(['rt'],axis=1,inplace=True) # drop 'rt' b/c not gonna use it.
+            pointwise_lik = bottom_node.value.copy()
+            pointwise_lik.index.names = ['trial_idx']        # change the index label as "trial_idx"
+            pointwise_lik.drop(['rt'],axis=1,inplace=True) # drop 'rt' b/c not gonna use it.
 
-        for i in node.value.index:
-            # get current params
-            for p in bottom_node.parents['reg_outcomes']:
-                param_dict[p] = bottom_node.parents.value[p].loc[i].item()
+            for i in bottom_node.value.index:
+                # get current params
+                for p in bottom_node.parents['reg_outcomes']:
+                    param_dict[p] = bottom_node.parents.value[p].loc[i].item()
+
+                # calculate the point-wise likelihood.
+                tmp_lik = hddm.wfpt.pdf_array(x = np.array(bottom_node.value.loc[i]),
+                                              v = np.array(param_dict['v']),
+                                               a = np.array(param_dict['a']), 
+                                               t = np.array(param_dict['t']),
+                                               p_outlier = param_dict['p_outlier'],
+                                               sv = param_dict['sv'],
+                                               z = param_dict['z'],
+                                               sz = param_dict['sz'],
+                                               st = param_dict['st'])
+                pointwise_lik.loc[i, 'log_lik'] = tmp_lik
                 
-            # calculate the point-wise likelihood.
-            tmp_lik = hddm.wfpt.pdf_array(x = np.array(node.value.loc[i]),
+            # check if there is zero prob.
+            if 0 in pointwise_lik.values:
+                pointwise_lik['log_lik']=pointwise_lik['log_lik'].replace(0.0, pointwise_lik['log_lik'].mean())
+
+            elif pointwise_lik['log_lik'].isnull().values.any():
+                print('NAN in the likelihood, check the data !')
+                break
+
+            pointwise_lik['log_lik'] = np.log(pointwise_lik['log_lik'])
+
+            if np.isinf(pointwise_lik['log_lik']).values.sum() > 0:
+                print('Correction does not work!!!\n')
+                
+        # for other models
+        else:
+            tmp_lik = hddm.wfpt.pdf_array(x = bottom_node.value['rt'].values,
                                           v = np.array(param_dict['v']),
-                                           a = np.array(param_dict['a']), 
-                                           t = np.array(param_dict['t']),
-                                           p_outlier = param_dict['p_outlier'],
-                                           sv = param_dict['sv'],
-                                           z = param_dict['z'],
-                                           sz = param_dict['sz'],
-                                           st = param_dict['st'])
-            pointwise_lik.loc[i, 'log_lik'] = np.log(tmp_lik)
+                                          a = np.array(param_dict['a']), 
+                                          t = np.array(param_dict['t']),
+                                          p_outlier = param_dict['p_outlier'],
+                                          sv = param_dict['sv'],
+                                          z = param_dict['z'],
+                                          sz = param_dict['sz'],
+                                          st = param_dict['st'])
+            # check if there is zero prob.
+            if np.sum(tmp_lik == 0.0) > 0:
+                tmp_lik[tmp_lik == 0.0] = np.mean(tmp_lik)
+            elif np.sum(np.isnan(tmp_lik))  > 0:
+                print('NAN in the likelihood, check the data !')
+                break
+
+#             obs = np.log(tmp_lik)                
+            tmp_lik = np.log(tmp_lik)
+            
+            if np.sum(np.isinf(tmp_lik)) > 0:
+                print('Correction does not work!!!\n')
+
+            pointwise_lik = pd.DataFrame({'log_lik': tmp_lik}, index=bottom_node.value.index)
+            pointwise_lik.index.names = ['trial_idx'] 
 
         datasets.append(pointwise_lik)
 
@@ -86,7 +129,7 @@ def pointwise_like_gen(model, groupby=None, samples=None, append_data=False, pro
         Hierarchical pandas.DataFrame with multiple sampled RT data sets.
         1st level: wfpt node
         2nd level: draw, i.e., draw/sample of MCMC
-        3rd level: original data index, which was renamed as "row_idx"
+        3rd level: original data index, which was renamed as "trial_idx"
     :See also:
         post_pred_stats
     """

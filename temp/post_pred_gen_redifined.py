@@ -20,6 +20,7 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     import pymc as pm
     import numpy as np
     
+    
     datasets = []
 
     ##############################
@@ -35,10 +36,12 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
         else:
             mc_len = len(parent.trace())
             break
+
     # samples=samples
     if samples is None:
-            samples = mc_len
-            print("Number of samples is equal to length of MCMC trace.")
+
+        samples = mc_len
+        print("\nNumber of PPC samples is equal to length of MCMC trace.")
 
     assert samples, "Can not determine the number of samples"
     
@@ -49,6 +52,18 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
             # Generate data from bottom node
             sampled_data = bottom_node.random()
             
+            # change the index of ppc data if it is not the same as the observed data
+            # here we used the all() because `any` will cause a mess in the first node's index
+            if not all(sampled_data.index == bottom_node.value.index): 
+                sampled_data.index = bottom_node.value.index
+               
+            sampled_data.index.names = ['trial_idx']
+
+            # add the "response" column for regression models
+            if not "response" in sampled_data.columns:
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
+                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
+                        
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
             datasets.append(sampled_data)
@@ -60,6 +75,15 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
 
             # Generate data from bottom node
             sampled_data = bottom_node.random()
+            # change the index of ppc data if it is not the same as the observed data
+            if not any(sampled_data.index == bottom_node.value.index): 
+                sampled_data.index = bottom_node.value.index
+            sampled_data.index.names = ['trial_idx']
+            
+            # add the "response" column for regression models
+            if not "response" in sampled_data.columns:
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
+                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
 
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
@@ -88,7 +112,7 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
         Hierarchical pandas.DataFrame with multiple sampled RT data sets.
         1st level: wfpt node
         2nd level: draw, i.e., draw of MCMC or samples of posterior predictive.
-        3rd level: original data index (row_idx)
+        3rd level: original data index (trial_idx)
     :See also:
         post_pred_stats
     """
@@ -110,7 +134,6 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
     else:
         iter_data = model.data.groupby(groupby)
 
-
     for name, data in iter_data:
         node = model.get_data_nodes(data.index)
 
@@ -124,12 +147,10 @@ def post_pred_gen(model, groupby=None, samples=None, append_data=False, progress
         ##############################
         # Sample and generate stats
         datasets = _post_pred_generate(node, samples=samples, data=data, append_data=append_data)
-        results[name] = pd.concat(datasets, names=['draw'], keys=list(range(len(datasets))))
-            
+        results[name] = pd.concat(datasets, names=['draw'], keys=list(range(len(datasets))))            
 
     if progress_bar:
         bar_iter += 1
         bar.update(bar_iter)
-
 
     return pd.concat(results, names=['node'])
