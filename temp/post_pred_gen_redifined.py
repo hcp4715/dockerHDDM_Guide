@@ -61,8 +61,8 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
 
             # add the "response" column for regression models
             if not "response" in sampled_data.columns:
-                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
-                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1.,
+                                                    np.where(sampled_data['rt'] <=0, 0., None)) 
                         
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
@@ -82,8 +82,8 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
             
             # add the "response" column for regression models
             if not "response" in sampled_data.columns:
-                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
-                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1.,
+                                                    np.where(sampled_data['rt'] <=0, 0., None)) 
 
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
