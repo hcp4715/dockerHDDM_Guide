@@ -319,6 +319,7 @@ def default_grid(n_items, grid=None, max_cols=4, min_cols=3):  # noqa: D202
         Rows and columns, so that rows * columns >= n_items
     """
     from rcparams import rcParams
+    import numpy as np
     if grid is None:
 
         def in_bounds(val):
