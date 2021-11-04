@@ -41,7 +41,7 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     if samples is None:
 
         samples = mc_len
-        print("\nNumber of PPC samples is equal to length of MCMC trace.")
+        # print("\nNumber of PPC samples is equal to length of MCMC trace.")
 
     assert samples, "Can not determine the number of samples"
     
@@ -75,8 +75,9 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
 
             # Generate data from bottom node
             sampled_data = bottom_node.random()
+            
             # change the index of ppc data if it is not the same as the observed data
-            if not any(sampled_data.index == bottom_node.value.index): 
+            if not all(sampled_data.index == bottom_node.value.index): 
                 sampled_data.index = bottom_node.value.index
             sampled_data.index.names = ['trial_idx']
             
