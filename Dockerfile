@@ -37,7 +37,6 @@ RUN conda install --quiet --yes \
     'jupyterlab_widgets' \
     'matplotlib-base=3.3.*' \
     'mkl-service' \
-    # numba update to 0.49 fails resolving deps.
     'numba=0.54.*' \
     'numexpr=2.7.*' \
     'pandas=1.0.*' \
