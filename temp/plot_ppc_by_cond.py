@@ -38,11 +38,34 @@ def plot_ppc_by_cond(
     ----------
 
     """
+    from arviz.plots.plot_utils import (
+        default_grid,
+        filter_plotters_list,
+        get_plotting_function,
+        _scale_fig_size,
+    )
+    
+    from arviz.labels import BaseLabeller
+    from arviz.sel_utils import xarray_var_iter
+    from arviz.rcparams import rcParams
+    
+    from arviz.utils import (
+        _var_names,
+        _subset_list,
+    )
+    
+#         xarray_sel_iter,
+#         _dims,
+#         _zip_dims,
+#         _scale_fig_size,
+        
     from itertools import product
-    from func4PPCPlot import _var_names, _subset_list, BaseLabeller, filter_plotters_list 
-    from func4PPCPlot import xarray_sel_iter, xarray_var_iter, _dims, _zip_dims
-    from func4PPCPlot import default_grid, get_plotting_function
-    from rcparams import rcParams
+    # _var_names, _subset_list, filter_plotters_list,
+    # xarray_sel_iter, xarray_var_iter, _dims, _zip_dims
+#     from func4PPCPlot import , , 
+#     from func4PPCPlot import 
+#     from func4PPCPlot import default_grid, get_plotting_function
+    # from rcparams import 
     from numbers import Integral
     import numpy as np
     

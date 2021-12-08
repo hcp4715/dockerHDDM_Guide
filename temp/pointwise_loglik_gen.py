@@ -45,7 +45,7 @@ def _pointwise_like_generate(bottom_node, samples=None, data=None, append_data=F
 
             pointwise_lik = bottom_node.value.copy()
             pointwise_lik.index.names = ['trial_idx']        # change the index label as "trial_idx"
-            pointwise_lik.drop(['rt'],axis=1,inplace=True) # drop 'rt' b/c not gonna use it.
+            pointwise_lik.drop(['rt'],axis=1,inplace=True)   # drop 'rt' b/c not gonna use it.
 
             for i in bottom_node.value.index:
                 # get current params
@@ -135,6 +135,9 @@ def pointwise_like_gen(model, groupby=None, samples=None, append_data=False, pro
     """
     import pymc.progressbar as pbar
     import pandas as pd
+    
+    print("started to generate posterior predicitves")
+    
     results = {}
 
     # Progress bar

@@ -299,7 +299,7 @@ def _zip_dims(new_dims, vals):
     return [{k: v for k, v in zip(new_dims, prod)} for prod in product(*vals)]
 
 
-def default_grid(n_items, grid=None, max_cols=4, min_cols=3):  # noqa: D202
+def default_grid(n_items, grid=None, max_cols=2, min_cols=1):  # noqa: D202
     """Make a grid for subplots.
     Tries to get as close to sqrt(n_items) x sqrt(n_items) as it can,
     but allows for custom logic

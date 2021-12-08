@@ -1,5 +1,5 @@
 # https://github.com/hddm-devs/kabuki/blob/master/kabuki/analyze.py#L420
-def _parents_to_random_posterior_sample(bottom_node, pos=None):
+def _parents_to_posterior_sample(bottom_node, pos=None):
     """Walks through parents and sets them to pos sample."""
     import pymc as pm
     import numpy as np
@@ -15,7 +15,7 @@ def _parents_to_random_posterior_sample(bottom_node, pos=None):
         parent.value = parent.trace()[pos]
 
 # https://github.com/hddm-devs/kabuki/blob/master/kabuki/analyze.py#L271
-def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False):
+def _PP_generate(bottom_node, pp_type="posterior", samples=None, data=None, append_data=False):
     """Generate posterior predictive data from a single observed node."""
     import pymc as pm
     import numpy as np
@@ -45,7 +45,11 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     
     if samples == mc_len:
         for sample in range(samples):
-            _parents_to_random_posterior_sample(bottom_node, pos = sample)
+            
+            # the key difference between prior and posterior predictive is here,
+            # whether or not using the traces number as the value of parents and extended parents
+            if pp_type == 'posterior':
+                _parents_to_posterior_sample(bottom_node, pos = sample)
             
             # Generate data from bottom node
             sampled_data = bottom_node.random()
@@ -54,8 +58,8 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
 
             # add the "response" column for regression models
             if not "response" in sampled_data.columns:
-                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
-                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1.0,
+                                                    np.where(sampled_data['rt'] <=0, 0.0, None)) 
                         
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
@@ -64,7 +68,9 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     else:
         for sample in range(samples):
             pos = np.random.randint(0, mc_len)
-            _parents_to_random_posterior_sample(bottom_node, pos = pos)
+            
+            if pp_type == 'posterior':
+                _parents_to_posterior_sample(bottom_node, pos = pos)
 
             # Generate data from bottom node
             sampled_data = bottom_node.random()
@@ -73,8 +79,8 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
             
             # add the "response" column for regression models
             if not "response" in sampled_data.columns:
-                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1,
-                                                    np.where(sampled_data['rt'] <=0, 0, None)) 
+                sampled_data["response"] = np.where(sampled_data['rt'] > 0, 1.0,
+                                                    np.where(sampled_data['rt'] <=0, 0.0, None)) 
 
             if append_data and data is not None:
                 sampled_data = sampled_data.join(data.reset_index(), lsuffix='_sampled')
@@ -83,11 +89,11 @@ def _post_pred_generate(bottom_node, samples=None, data=None, append_data=False)
     return datasets
 
 # https://github.com/hddm-devs/kabuki/blob/master/kabuki/analyze.py#L287
-def prior_pred_gen(model, groupby=None, samples=None, append_data=False, progress_bar=True):
+def PP_gen(model, pp_type="posterior", groupby=None, samples=None, append_data=False, progress_bar=True):
     """Run prior predictive check on a model. (not finished yet)
     :Arguments:
         model : kabuki.Hierarchical
-            Kabuki model over which to compute the ppc on.
+            Kabuki model over which to compute the ppc.
     :Optional:
         samples : int
             How many samples to generate for each node. If None, will used the MCMC samples
@@ -137,7 +143,7 @@ def prior_pred_gen(model, groupby=None, samples=None, append_data=False, progres
 
         ##############################
         # Sample and generate stats
-        datasets = _post_pred_generate(node, samples=samples, data=data, append_data=append_data)
+        datasets = _PP_generate(node, pp_type='prior', samples=samples, data=data, append_data=append_data)
         results[name] = pd.concat(datasets, names=['draw'], keys=list(range(len(datasets))))            
 
     if progress_bar:
