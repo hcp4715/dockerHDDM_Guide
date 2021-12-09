@@ -57,22 +57,6 @@ RUN conda install --quiet --yes \
     'pymc=2.3.8' \
     && \
     conda clean --all -f -y && \
-    # Activate ipywidgets extension in the environment that runs the notebook server
-    # jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    # Activate ipyparallel extension in the enviroment
-    # ipcluster nbextension enable && \
-    # # Also activate ipywidgets extension for JupyterLab
-    # # Check this URL for most recent compatibilities
-    # # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-    # jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build && \
-    # jupyter labextension install @bokeh/jupyter_bokeh@^2.0.0 --no-build && \
-    # jupyter labextension install jupyter-matplotlib@^0.7.2 --no-build && \
-    # jupyter lab build -y && \
-    # jupyter lab clean -y && \
-    # npm cache clean --force && \
-    # fix-permissions "${CONDA_DIR}" &&\
-    # rm -rf "/home/${NB_USER}/.cache/yarn" && \
-    # rm -rf "/home/${NB_USER}/.node-gyp" && \
     fix-permissions "/home/${NB_USER}"
 
 # conda install --channel=numba llvmlite
@@ -100,15 +84,6 @@ RUN pip install --upgrade pip && \
 # uninstall old kabuki and install from Github, specify the commit at Jul 9, 2021
 RUN pip install --no-cache-dir git+git://github.com/hddm-devs/kabuki.git@9f9c30189f0756c360b37aa8ed4b72d5b4dbb40c && \
     fix-permissions "/home/${NB_USER}"
-
-# # Install facets which does not have a pip or conda package at the moment
-# WORKDIR /tmp
-
-# RUN git clone https://github.com/PAIR-code/facets.git && \
-#     jupyter nbextension install facets/facets-dist/ --sys-prefix && \
-#     rm -rf /tmp/facets && \
-#     fix-permissions "${CONDA_DIR}"  &&\
-#     fix-permissions "/home/${NB_USER}"
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
@@ -139,12 +114,13 @@ RUN jupyter notebook --generate-config -y
 
 USER $NB_UID
 # Copy example data and scripts to the example folder
-RUN mkdir /home/$NB_USER/examples && \
+RUN mkdir /home/$NB_USER/scripts && \
     rm -r /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER
 
-# COPY /example/Hddm_test_parallel.ipynb /home/${NB_USER}/example
-# COPY /example/df_example.csv /home/${NB_USER}/example
-# COPY /example/HDDM_official_tutorial_ArviZ.ipynb /home/${NB_USER}/example
-# COPY /example/HDDM_official_tutorial_reproduced.ipynb /home/${NB_USER}/example
+COPY /temp/Tutorial_DDM_docker.ipynb /home/${NB_USER}/scripts
+COPY /scripts/HDDMarviz.py /home/${NB_USER}/scripts
+COPY /scripts/plot_ppc_by_cond.py /home/${NB_USER}/scripts
+COPY /scripts/pointwise_loglik_gen.py /home/${NB_USER}/scripts
+COPY /scripts/post_pred_gen_redefined.py /home/${NB_USER}/scripts
 
