@@ -4,17 +4,17 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
     
     """
     import sys, os, time, csv, glob
+    import feather
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import numpy as np
+    import pandas as pd
+    import xarray as xr
+    
     import pymc as pm
     import hddm
     import kabuki
-
     import arviz as az
-    import numpy as np
-    import pandas as pd
-    import feather
-    import xarray as xr
-    import matplotlib.pyplot as plt
-    import seaborn as sns
     from patsy import dmatrix
 
     from p_tqdm import p_map
@@ -83,14 +83,8 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
         xdata_post_pred = [] # define an empty dict      
         xdata_post_pred = p_map(partial(post_pred_gen, samples = nppc), ms_tmp)
 
-    #         print("Save PPC to feather files")
         for chain in range(len(xdata_post_pred)):
-            ftrname = "df_" + m_key + "_ppc_chain_" + str(chain) + ".ftr"
-    #             print(ftrname)
-#             xdata_post_pred[chain].reset_index().to_feather(ftrname)
             xdata_post_pred[chain]["response"] = xdata_post_pred[chain]["response"].astype(float)
-
-    #         print("Generating PPC for ", m_key, " costs %f seconds" % (time.time() - start_time))
 
         xdata_post_pred = pd.concat(xdata_post_pred, names=['chain'], 
                                     keys = list(range(len(xdata_post_pred))))
@@ -99,30 +93,21 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
 
         ### Point-wise log likelihood
         xdata_loglik = [] # define an empty dict
-    #         print("start calculating loglik for ", m_key)
-        start_time = time.time()  # the start time of the processing
         xdata_loglik = p_map(partial(pointwise_like_gen), ms_tmp)
-
-        for chain in range(len(xdata_loglik)):
-            ftrname = "df_" + m_key + "_pll_chain_" + str(chain) + ".ftr"
-    #             print(ftrname)
-#             xdata_loglik[chain].reset_index().to_feather(ftrname)
-
-    #         print("Generating loglik for", m_key, " costs %f seconds" % (time.time() - start_time))
-
         xdata_loglik = pd.concat(xdata_loglik, names=['chain'], 
-                                keys = list(range(len(xdata_loglik))))
+                                 keys = list(range(len(xdata_loglik))))
         xdata_loglik = xdata_loglik.reset_index(level=1, drop=True)
         xdata_loglik = xr.Dataset.from_dataframe(xdata_loglik)
 
         ### convert to InfData
         InfData_tmp = az.InferenceData(posterior=xdata_posterior, 
-                                                 observed_data=xdata_observed,
-                                                 posterior_predictive=xdata_post_pred,
-                                                 log_likelihood = xdata_loglik)
+                                       observed_data=xdata_observed,
+                                       posterior_predictive=xdata_post_pred,
+                                       log_likelihood = xdata_loglik)
         
         ### save the InfData for later use
         InfData_tmp.to_netcdf(InfDataName)
+        
     return ms_tmp, InfData_tmp 
 
 def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, thin=1, chains=4, savefile=True, savetag=None):
@@ -130,8 +115,7 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
     Run a model or a list of models in parallel and return an ArviZ InfData or a list of InfData
     
     data: dataframe, input data, can be simulated data or real data
-    model_func: string, which HDDM function will be used, "HDDM", "HDDMStimulus", "HDDMRegressor".
-    model_spec: string, which define the model
+    model_func: string, which defines a function or a list of func that can fit data with "HDDM", "HDDMStimulus", "HDDMRegressor".
     samples: int, n of sample for mcmc
     nppc: # of posterior predictive check, default is 1000, if None, the number will be same as posterior samples, i.e., (samples - burn)/thin
     burn: int, n of sample that will burn in
@@ -156,8 +140,6 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
                                      chains=chains, 
                                      savefile=savefile,
                                      savetag=savetag)
-        
-        # save to models and NetCDF
     
     # if model_func is a list of functions
     elif isinstance(model_func, list):
