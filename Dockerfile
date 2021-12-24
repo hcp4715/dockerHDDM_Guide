@@ -22,7 +22,7 @@ RUN conda install --quiet --yes \
     'arviz=0.11.4' \
     'beautifulsoup4=4.9.*' \
     'conda-forge::blas=*=openblas' \
-    'bokeh=2.0.*' \
+    'bokeh=2.4.*' \
     'bottleneck=1.3.*' \
     'cloudpickle=1.4.*' \
     'cython=0.29.*' \
@@ -81,8 +81,8 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir 'bambi==0.6.*' && \
     fix-permissions "/home/${NB_USER}"
 
-# uninstall old kabuki and install from Github, specify the commit at Jul 9, 2021
-RUN pip install --no-cache-dir git+git://github.com/hddm-devs/kabuki.git@9f9c30189f0756c360b37aa8ed4b72d5b4dbb40c && \
+# uninstall old kabuki and install from Github, specify the commit at Sep 24, 2021, before Alex's new ppc_plot 
+RUN pip install --no-cache-dir git+git://github.com/hddm-devs/kabuki.git@57338156ffbd449e54227b3123f6b9d0b40179ca && \
     fix-permissions "/home/${NB_USER}"
 
 # Import matplotlib the first time to build the font cache.

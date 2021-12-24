@@ -1,8 +1,9 @@
 def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,chains=4,savefile=True,savetag=None):
     """
-    Run one model in ArviZ fashion
+    Run one HDDM and convert to InferenceData
+    
     """
-    import sys, os, time, csv
+    import sys, os, time, csv, glob
     import pymc as pm
     import hddm
     import kabuki
@@ -26,82 +27,102 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
     from pointwise_loglik_gen import _pointwise_like_generate
     from pointwise_loglik_gen import pointwise_like_gen
     
-    m_key = model.__name__  # get the model function's name
+    # get the model function's name for saving name
+    m_key = model.__name__  
     
     if savetag is not None:
         save_name_m = m_key + "_" + savetag
     else:
         save_name_m = m_key
+        
+# Check whether InferenceData with the same name already exist, if yes, we won't rerun the whole process
+    InfDataName = save_name_m + "_netcdf"
+    if os.path.exists(InfDataName):
+        print("Inference data ", save_name_m, " already exist, will load model data instead of re-run")
+        
+        # Load netcdf file
+        InfData_tmp = az.from_netcdf(InfDataName)
+        
+        # Load model files, here we assume that both model object and inferencedata were saved.
+        file_names = glob.glob(save_name_m + "_chain_*[!db]", recursive=False)
+        file_names = sorted(file_names, key=lambda x: x[-1]) # sort filenames by chain ID
+        ms_tmp = []
+        for fname in file_names:
+            print('current loading: ', fname, '\n')
+            ms_tmp.append(hddm.load(fname))
+        
+    else:
+        print("start model fitting for {}".format(m_key))
     
-    print("start model fitting for {}".format(m_key))
-    ms_tmp = p_map(partial(model, 
-                           df=data, 
-                           samples=samples,
-                           burn=burn,
-                           thin=thin, 
-                           save_name=save_name_m),
-                   range(chains))
+        ms_tmp = p_map(partial(model, 
+                               df=data, 
+                               samples=samples,
+                               burn=burn,
+                               thin=thin, 
+                               save_name=save_name_m),
+                       range(chains))
 
-    ### Observations
-    xdata_observed = ms_tmp[0].data.copy()
-    xdata_observed.index.names = ['trial_idx']
-    xdata_observed = xdata_observed[['rt', 'response']]
-    xdata_observed = xr.Dataset.from_dataframe(xdata_observed)
+        ### Observations
+        xdata_observed = ms_tmp[0].data.copy()
+        xdata_observed.index.names = ['trial_idx']
+        xdata_observed = xdata_observed[['rt', 'response']]
+        xdata_observed = xr.Dataset.from_dataframe(xdata_observed)
 
-    ### posteriors
-    xdata_posterior = []
-    for jj in range(len(ms_tmp)):
-        trace_tmp = ms_tmp[jj].get_traces()
-        trace_tmp['chain'] = jj
-        trace_tmp['draw'] = np.arange(len(trace_tmp), dtype=int)
-        xdata_posterior.append(trace_tmp)
-    xdata_posterior = pd.concat(xdata_posterior)
-    xdata_posterior = xdata_posterior.set_index(["chain", "draw"])
-    xdata_posterior = xr.Dataset.from_dataframe(xdata_posterior)
+        ### posteriors
+        xdata_posterior = []
+        for jj in range(len(ms_tmp)):
+            trace_tmp = ms_tmp[jj].get_traces()
+            trace_tmp['chain'] = jj
+            trace_tmp['draw'] = np.arange(len(trace_tmp), dtype=int)
+            xdata_posterior.append(trace_tmp)
+        xdata_posterior = pd.concat(xdata_posterior)
+        xdata_posterior = xdata_posterior.set_index(["chain", "draw"])
+        xdata_posterior = xr.Dataset.from_dataframe(xdata_posterior)
 
-    ### PPC
-    xdata_post_pred = [] # define an empty dict    
-#    print("start PPC for ", m_key)
-#    start_time = time.time()  
-    xdata_post_pred = p_map(partial(post_pred_gen, samples = nppc), ms_tmp)
+        ### Posterior predictives
+        xdata_post_pred = [] # define an empty dict      
+        xdata_post_pred = p_map(partial(post_pred_gen, samples = nppc), ms_tmp)
 
-#         print("Save PPC to feather files")
-    for chain in range(len(xdata_post_pred)):
-        ftrname = "df_" + m_key + "_ppc_chain_" + str(chain) + ".ftr"
-#             print(ftrname)
-        xdata_post_pred[chain].reset_index().to_feather(ftrname)
-        xdata_post_pred[chain]["response"] = xdata_post_pred[chain]["response"].astype(float)
+    #         print("Save PPC to feather files")
+        for chain in range(len(xdata_post_pred)):
+            ftrname = "df_" + m_key + "_ppc_chain_" + str(chain) + ".ftr"
+    #             print(ftrname)
+#             xdata_post_pred[chain].reset_index().to_feather(ftrname)
+            xdata_post_pred[chain]["response"] = xdata_post_pred[chain]["response"].astype(float)
 
-#         print("Generating PPC for ", m_key, " costs %f seconds" % (time.time() - start_time))
+    #         print("Generating PPC for ", m_key, " costs %f seconds" % (time.time() - start_time))
 
-    xdata_post_pred = pd.concat(xdata_post_pred, names=['chain'], 
-                                keys = list(range(len(xdata_post_pred))))
-    xdata_post_pred = xdata_post_pred.reset_index(level=1, drop=True)
-    xdata_post_pred = xr.Dataset.from_dataframe(xdata_post_pred)
+        xdata_post_pred = pd.concat(xdata_post_pred, names=['chain'], 
+                                    keys = list(range(len(xdata_post_pred))))
+        xdata_post_pred = xdata_post_pred.reset_index(level=1, drop=True)
+        xdata_post_pred = xr.Dataset.from_dataframe(xdata_post_pred)
 
-    ### Point-wise log likelihood
-    xdata_loglik = [] # define an empty dict
-#         print("start calculating loglik for ", m_key)
-    start_time = time.time()  # the start time of the processing
-    xdata_loglik = p_map(partial(pointwise_like_gen), ms_tmp)
+        ### Point-wise log likelihood
+        xdata_loglik = [] # define an empty dict
+    #         print("start calculating loglik for ", m_key)
+        start_time = time.time()  # the start time of the processing
+        xdata_loglik = p_map(partial(pointwise_like_gen), ms_tmp)
 
-    for chain in range(len(xdata_loglik)):
-        ftrname = "df_" + m_key + "_pll_chain_" + str(chain) + ".ftr"
-#             print(ftrname)
-        xdata_loglik[chain].reset_index().to_feather(ftrname)
+        for chain in range(len(xdata_loglik)):
+            ftrname = "df_" + m_key + "_pll_chain_" + str(chain) + ".ftr"
+    #             print(ftrname)
+#             xdata_loglik[chain].reset_index().to_feather(ftrname)
 
-#         print("Generating loglik for", m_key, " costs %f seconds" % (time.time() - start_time))
+    #         print("Generating loglik for", m_key, " costs %f seconds" % (time.time() - start_time))
 
-    xdata_loglik = pd.concat(xdata_loglik, names=['chain'], 
-                            keys = list(range(len(xdata_loglik))))
-    xdata_loglik = xdata_loglik.reset_index(level=1, drop=True)
-    xdata_loglik = xr.Dataset.from_dataframe(xdata_loglik)
+        xdata_loglik = pd.concat(xdata_loglik, names=['chain'], 
+                                keys = list(range(len(xdata_loglik))))
+        xdata_loglik = xdata_loglik.reset_index(level=1, drop=True)
+        xdata_loglik = xr.Dataset.from_dataframe(xdata_loglik)
 
-    ### convert to InfData
-    InfData_tmp = az.InferenceData(posterior=xdata_posterior, 
-                                             observed_data=xdata_observed,
-                                             posterior_predictive=xdata_post_pred,
-                                             log_likelihood = xdata_loglik)
+        ### convert to InfData
+        InfData_tmp = az.InferenceData(posterior=xdata_posterior, 
+                                                 observed_data=xdata_observed,
+                                                 posterior_predictive=xdata_post_pred,
+                                                 log_likelihood = xdata_loglik)
+        
+        ### save the InfData for later use
+        InfData_tmp.to_netcdf(InfDataName)
     return ms_tmp, InfData_tmp 
 
 def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, thin=1, chains=4, savefile=True, savetag=None):
@@ -135,6 +156,8 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
                                      chains=chains, 
                                      savefile=savefile,
                                      savetag=savetag)
+        
+        # save to models and NetCDF
     
     # if model_func is a list of functions
     elif isinstance(model_func, list):
