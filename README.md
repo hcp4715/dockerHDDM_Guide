@@ -1,7 +1,7 @@
-# Ten Simple Steps for Principled Bayesian Hierarchical Drift-Diffusion Modelling with HDDM
+# Reproducible Bayesian hierarchical drift-diffusion modelling with docker
 
 ## What is HDDM? 
-A python package for hierachical drift-diffusion models.
+A python package for hierarchical drift-diffusion models.
 
 This docker image included XX major toolbox for sequential sampling modeling, including:
 * HDDM is a python package for hierarchical drift diffusion modelling, see [here](http://ski.clps.brown.edu/hddm_docs/index.html) for more.
@@ -22,7 +22,7 @@ Second, to use the partical parts, you need to pull the docker image from docker
 docker pull hcp4715/ddm:tutorial_v1
 ```
 
-**Note**: you may need sudo permission to run `docker`.
+**Note**: you may need `sudo` permission to run `docker`.
 
 After pulling it from docker hub, you can then run jupyter notebook in the container (e.g., in bash of linux):
 
