@@ -35,7 +35,7 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
     else:
         save_name_m = m_key
         
-# Check whether InferenceData with the same name already exist, if yes, we won't rerun the whole process
+    # Check whether InferenceData with the same name already exist, if yes, we won't rerun the whole process
     InfDataName = save_name_m + "_netcdf"
     if os.path.exists(InfDataName):
         print("Inference data ", save_name_m, " already exist, will load model data instead of re-run")
