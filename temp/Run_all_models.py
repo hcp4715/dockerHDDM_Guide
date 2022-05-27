@@ -44,9 +44,11 @@ def main():
     parser.add_argument('--savetag', '-tag', type=str, default=None)
     args = parser.parse_args()
     
-    data = hddm.load_csv(os.path.join(os.path.dirname(hddm.__file__), 
-                                           'examples', 
-                                           'cavanagh_theta_nn.csv'))
+    # data = hddm.load_csv(os.path.join(os.path.dirname(hddm.__file__), 
+    #                                       'examples', 
+    #                                       'cavanagh_theta_nn.csv'))
+    
+    data = hddm.load_csv('data_cv_val2.csv')
     
     # Run a simple and quick model to test the script.
     if args.test == 1:
