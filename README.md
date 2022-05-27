@@ -4,16 +4,17 @@
 A python package for hierarchical drift-diffusion models.
 
 ### Scope of the current tutorial
-We limited our tutorial to classic functions in HDDM, insteading of the latest version of HDDM (0.9.5), which included likelihood-free methods that are not stable and widely used yet. However, the docker image of HDDM 0.9.5 is available.
+We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.5), which included likelihood-free methods that are not stable and widely used yet. However, the docker image of HDDM 0.9.5 is available.
 
 ## Motivation behind this guide
 1. HDDM is an influential package for DDM, which is an class of models that used widely in different fields
 2. HDDM' tutorial is outdated 
-3. User's forum had accumulated some common issues that trouble beginners.
+3. Principled workflow are recommended in recent year.
 
 ## How to use this guide
 
-First, this guide included both theoretical and pratical parts. 
+First, this guide included both theoretical and practical parts. 
+
 Second, all scripts and code were packaged into a docker image. You need to pull the docker image from docker hub. To do so, first install docker and test it. There are many tutorial on this, here is one on [docker's website](https://docs.docker.com/engine/install/ubuntu/) for linux. Then, pull the docker image from docker hub:
 
 ```
@@ -26,7 +27,7 @@ After pulling it from docker hub, you can then run jupyter notebook in the conta
 
 ```
 docker run -it --rm --cpus=5 \
--v /home/hcp4715/hddm_docker:/home/jovyan/work \
+-v /home/hcp4715/DDM_guide:/home/jovyan/work \
 -p 8888:8888 hcp4715/hddm:0.8_tutorial jupyter notebook
 ```
 
@@ -40,7 +41,7 @@ docker run -it --rm --cpus=5 \
 
 `-v` ---- mount a folder to the container
 
-`/home/hcp4715/hddm_docker` ---- the directory of a local folder where I stored my data. 
+`/home/hcp4715/DDM_guide` ---- the directory of a local folder where I stored my data. 
 
 `/home/jovyan/work` ---- the folder path  where the local folder will be mounted. 
 

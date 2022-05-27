@@ -10,23 +10,28 @@ Example model is from [here](https://mc-stan.org/loo/articles/loo2-large-data.ht
 
 Subsampling was largely derived from two papers:
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data. Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. arXiv preprint arXiv:2001.00980.
+* Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data. Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. arXiv preprint arXiv:2001.00980.
 
-Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253 online, arXiv preprint arXiv:1904.10679.
+* Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253 online, arXiv preprint arXiv:1904.10679.
 
-The 2019 paper addressed the LOO in large dataset, the 2020 further extended this method for model comparison.
+The 2019 paper addressed the LOO in large dataset, using HH method, the 2020 further extended this method for model comparison, included the SRS method.
 
-Five steps were proposed for this:
+Six steps for subsampling in a single model:
 
-(1) Compute the posterior $p_A(\theta|y)$ and $p_B(\theta|y)$ for model A and B, respectively.
+* (1) Get the posterior, using any methods (In HDDM, we will not use approximation methods for now)
+* (2) Compute $\hat{k}$ diagnostic for the posterior to assess the posterior approximation (not applicable here);
+* (3) Compute $\tilde{\pi}$ for all $n$ observations.
+* (4) Sample $m$ observations using PPS/SRS sampling and compute $log \hat{p}(y_i|y)$. Using $\hat{k}$ to diagnose the estimation of each $log \hat{p}(y_i|y)$.
+* (5) Estimate $\widehat{elpd}_{loo}$, $v(\widehat{elpd}_{loo})$, and $\hat{\theta}_{loo}^2$.
+* (6) repeat step 3 and 4 util sufficient precision is reached.
 
-(2) Compute $\tilde{\pi}$ for model A and B using an approximation that fulfill the properties in Sec. 2.2.
+Five steps for model comparison:
 
-(3) Compute the approximate difference as $\tilde{\pi}_{i, D} = \tilde{\pi}_{i, A} - \tilde{\pi}_{i, B}$ for all $n$.
-
-(4) Draw a subsample of size $m$ and compute $\tilde{\pi}_{j, D} = \tilde{\pi}_{j, A} - \tilde{\pi}_{j, B}$ for all $m$.
-
-(5) Estimate $elpd_D$ and $V(elpd_D)$ using Eq. (7) and (8)
+* (1) Compute the posterior $p_A(\theta|y)$ and $p_B(\theta|y)$ for model A and B, respectively.
+* (2) Compute $\tilde{\pi}$ for model A and B using an approximation that fulfill the properties in Sec. 2.2.
+* (3) Compute the approximate difference as $\tilde{\pi}_{i, D} = \tilde{\pi}_{i, A} - \tilde{\pi}_{i, B}$ for all $n$.
+* (4) Draw a subsample of size $m$ and compute $\tilde{\pi}_{j, D} = \tilde{\pi}_{j, A} - \tilde{\pi}_{j, B}$ for all $m$.
+* (5) Estimate $elpd_D$ and $V(elpd_D)$ using Eq. (7) and (8)
 
 ## Preparation
 ```{r Loading libraries}
