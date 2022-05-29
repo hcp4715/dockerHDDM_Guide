@@ -41,8 +41,22 @@ library(rstan)
 library(loo)
 ```
 
-## Run the example
+## First, run the example
 The example here is a model that predict the well-switching response given two predictors: the arsenic level of the water in the resident’s home, and the distance of the house from the nearest safe well. 
+
+Two-Step for subsampling. Step one is a normal MCMC, using stan, with three input:
+
+* llfun: loglikelihood function;
+* data: 
+* Stan model:
+
+Step two is the subsampleing, the input are:
+
+* llfun:
+* observation: size of subsample
+* r_eff: relative effect sample size
+* draws: posterior draw from MCMC
+* data: the original data.
 
 ```{r subsampling example}
 # we'll add an argument log to toggle whether this is a log-likelihood or 
@@ -65,18 +79,10 @@ standata <- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
 
 # Compile
 stan_mod <- stan_model("logistic.stan")
-# cmdsta_mod <- cmdstan_model("logistic.stan")
 
 # Fit model
 fit_1 <- sampling(stan_mod, data = standata, seed = 4711, cores = 4)
 
-# fit_2 <- cmdsta_mod$sample(
-#   data = standata,
-#   seed = 4711,
-#   chains = 4,
-#   parallel_chains = 4,
-#   refresh = 500 # print update every 500 iters
-# )
 print(fit_1, pars = "beta")
 
 parameter_draws_1 <- extract(fit_1)$beta
@@ -92,7 +98,10 @@ r_eff <- relative_eff(llfun_logistic,
                       cores = 4)
 
 loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)
+```
 
+```{r}
+start.time <- Sys.time()
 # subsampling
 set.seed(4711)
 loo_ss_1 <-
@@ -105,17 +114,51 @@ loo_ss_1 <-
     draws = parameter_draws_1,
     data = stan_df_1
   )
-# print(loo_ss_1)
+time_loo_ss_1 <- Sys.time() - start.time
+print(paste("Time taken: ", time_loo_ss_1, "secs"))
+loo_ss_1
 ```
 
 ```{r}
-loo_ss_1
+start.time <- Sys.time()
+# subsampling
+set.seed(4711)
+loo_ss_2 <-
+  loo_subsample(
+    llfun_logistic,
+    observations = 100, # take a subsample of size 100
+    cores = 2,
+    # these next objects were computed above
+    loo_approximation = 'tis',
+    r_eff = r_eff, 
+    draws = parameter_draws_1,
+    data = stan_df_1
+  )
+time_loo_ss_2 <- Sys.time() - start.time
+print(paste("Time taken: ", time_loo_ss_2, "secs"))
+loo_ss_2
 ```
+
+```{r}
+start.time <- Sys.time()
+set.seed(4711)
+loo_1 <- loo(llfun_logistic,
+    cores = 4,
+    # these next objects were computed above
+    r_eff = r_eff, 
+    draws = parameter_draws_1,
+    data = stan_df_1)
+time_loo_1 <- Sys.time() - start.time
+print(paste("Time taken: ", time_loo_1, "secs"))
+loo_1
+```
+Comparing `loo_ss_1` and `loo_1`, we can see that the main different lies in the third column `subsampling_SE`, but the first two column is almost the same. However, the executing time is much faster for the subsampling with `plpd` method, the `pld` method will be even longer.
 
 ## Dissect the functions
 
 ### Log likelihood function
-Understand the log likelihood function (`llfun`) in this example. It return point-wise log-likelihood for each data point, based on the input `data_i`. 
+Understand the log likelihood function (`llfun`) in this example. It return point-wise log-likelihood for each data point, based on the input `data_i`.  Note that log likelihood function is different from the model, though the likelihood function is essential for MCMC in most models.
+
 ``` {r}
 # used for draws argument to loo_i
 parameter_draws_1 <- extract(fit_1)$beta
@@ -133,7 +176,7 @@ tmp <- dbinom(x = data_i$y, size = 1, prob = 1/(1 + exp(-logit_pred)), log = log
 
 ### Subsampling step-by-step
 
-#### Step 1: prepare the inputs
+#### Step 1: Preparing the inputs
 
 ```{r prepare inputs}
 draws <- parameter_draws_1  # 4000 * 3
@@ -142,12 +185,25 @@ llfun <- llfun_logistic
 N <- dim(data)[1]
 
 estimator <- "diff_srs"
-loo_approximation = 'plpd'
+loo_approximation <- 'plpd'
 
 observations <- 100
 ```
 
-#### Step 2: get the point-wise estimate
+#### Step 2: get the point estimate
+
+This is part of the `loo_approximation` in the `loo_subsample.R`. There are multiple ways to estimate these values, and the default is `plpd`.
+
+* `tis` or `sis`: returns the `loo_epld` using `loo.function()` (i.e., no approximation at all)
+* `lpd`: returns results of `compute_lpds`;
+* `plpd`: returns results of `compute_lpds`, with an addition input of `point_est`;
+* others: approximation methods.
+
+Here we first check how the `point_est` is computed: first calculate the mean of each columns (i.e., the mean of posterior of each parameter), then convert it to a matrix (dim: 3x1 ), and then transpose it to a 1X3 matrix. Thus point estimate basically using the mean of posterior. 
+
+This step is computing the $\hat{\theta}$ in the approximating the $\tilde{\pi} \propto -\text{log} p(y_i | \hat{\theta})$ (see section 2.5 in Magnusson et al. 2019).
+
+Thus the `point_est` mean point estimation, i.e., means value, not point-wise estimation.
 
 ```{r pointwise estimate}
 # here we replace the function .compute_point_estimate.matrix, which basically compute the means of parameters and transpose
@@ -159,6 +215,12 @@ point_est <- tmp_compute_point_estimate(draws)
 ```
 
 #### Step 3: Get the `elpd_loo_approx`
+
+Here we start to use the `point_est` to estimate the `epld_loo_approx`. Basically, we replace the `draws` argument with `point_est` so that we only need three thetas for all data.
+
+Essentially, it is a for loop, loop through the N data `llfun(data_i = data[i, , drop=FALSE], draws = draws)`, here only the mean of thetas are used to calculate the log-likelihood for each data point. After that, binding all the log-likelihood as a vector and calculate their `logMeanExp`. The question is: if we use the mean of thetas there, what's the difference between this verion of loo_cv and DIC?
+
+`elpd_loo_approx` is a vector of the same length as the data (here: 3020)
 
 ```{r elpd_loo_approx}
 ##  elpd_loo_approx <- elpd_loo_approximation ()...
@@ -204,6 +266,10 @@ elpd_loo_approximation <- elpd_loo_approx
 #### Step 4: get subsample_idxs
 
 Here we only use the default approach `diff_srs`.
+
+`diff_srs` use the simple random sampling without replacement (SRS), which basically randomly choose a subset of data. In this approach, the subset index was generated from ordering a uniform distribution with the same length of the `epld_loo_approx`, and then select the first subset with length of subsample size (which is defined by observation).
+
+It's different from the `hh_pps` approach, with use the proportion to sample the subset. However, the advantage of `srs` is that it can be used for model comparison
 
 ```{r subsample_idxs}
 # understand order()
