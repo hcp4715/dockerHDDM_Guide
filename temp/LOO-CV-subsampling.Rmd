@@ -218,7 +218,7 @@ point_est <- tmp_compute_point_estimate(draws)
 
 Here we start to use the `point_est` to estimate the `epld_loo_approx`. Basically, we replace the `draws` argument with `point_est` so that we only need three thetas for all data.
 
-Essentially, it is a for loop, loop through the N data `llfun(data_i = data[i, , drop=FALSE], draws = draws)`, here only the mean of thetas are used to calculate the log-likelihood for each data point. After that, binding all the log-likelihood as a vector and calculate their `logMeanExp`. The question is: if we use the mean of thetas there, what's the difference between this verion of loo_cv and DIC?
+Essentially, it is a for loop, loop through the N data `llfun(data_i = data[i, , drop=FALSE], draws = draws)`, here only the mean of thetas are used to calculate the log-likelihood for each data point. After that, binding all the log-likelihood as a vector and calculate their `logMeanExp`. The question is: if we use the mean of thetas there, what's the difference between this version of loo_cv and DIC?
 
 `elpd_loo_approx` is a vector of the same length as the data (here: 3020)
 
@@ -269,7 +269,9 @@ Here we only use the default approach `diff_srs`.
 
 `diff_srs` use the simple random sampling without replacement (SRS), which basically randomly choose a subset of data. In this approach, the subset index was generated from ordering a uniform distribution with the same length of the `epld_loo_approx`, and then select the first subset with length of subsample size (which is defined by observation).
 
-It's different from the `hh_pps` approach, with use the proportion to sample the subset. However, the advantage of `srs` is that it can be used for model comparison
+It's different from the `hh_pps` approach, with use the proportion to sample the subset. However, the advantage of `srs` is that it can be used for model comparison.
+
+Note that `idxs` has two columns, the first column is `idx`, the second one is `m_i`, which is `1` for all.
 
 ```{r subsample_idxs}
 # understand order()
@@ -299,7 +301,6 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations) {
   idxs_df
 }
 
-observations <- 100
 idxs <- subsample_idxs(
         estimator = "diff_srs", # here the default is simple random sampling (srs), i.e. randomly sub-sample
         elpd_loo_approximation = elpd_loo_approx,
@@ -307,7 +308,9 @@ idxs <- subsample_idxs(
 ```
 
 #### Step 5: Get the `loo_obj`
-Here we will use sub set of data, subset of r_eff and all posterior (draws) for the `loo_obj`. Note that the result already include output of `loo`.
+Here we will use sub set of data, subset of `r_eff`, and all of posterior (draws) for the `loo_obj`. Note that the result already include output of `loo`.
+
+The differences between the `loo_obj` and previous results of `loo()` are the data and `r_eff`. Thus the result are quite different. we can compare them here.
 
 ```{r get loo_obj}
 data_subsample <- data[idxs$idx,, drop = FALSE]
@@ -326,19 +329,101 @@ loo_obj <- loo.function(
       )
 ```
 
+```{r}
+loo_obj
+```
+```{r}
+loo_1
+```
 #### Step 6: get the `loo_obj_ss`
 
 This part is the most crucial one, in which the core function is `psis_loo_ss_object`.
 
-The `psis_loo_ss_object` in turn include two most important functions: `add_subsampling_vars_to_pointwise`, `loo_subsample_estimation_diff_srs`. The later is important because we use the `diff_srs` method.
+The `psis_loo_ss_object` in turn include the most important function `loo_subsample_estimation_diff_srs`, which is important because the `diff_srs` is applied here.
 
 If we skip all the code that are used for checking or asserting, then, after `loo`, the default subsampling method boil downs to two import functions: `srs_diff_est()` and `srs_est()`.
 
-`srs_diff_est()` takes three input: y_approx, which is the elpd_loo_approx, y, which is the `elpd_loo` from `loo()` function, and `y_idx`, which is the subsample index. `srs_est()` has two inputs: y, which is the `p_loo` from `loo()` function, and `y_approx`, which is also the elpd_loo_approx.
+`srs_diff_est()` calculate the `elpd_loo`'s estimate, SE, and subsampling SE, takes three input: 
 
-For `srs_diff_est()`, it will first get the length of all elpd_loo_approx (N), subsample length (m), and used the index to extract epld_loo_approx that corresponding the subsample. The formula is from Magnusson et al. (2020). More specifically, formula (7), (8), (9).
+* `y_approx`: the elpd_loo_approx;
+* `y`: the `elpd_loo` from `loo()` function;
+* `y_idx`: the subsample index. 
+
+For `srs_diff_est()`, it will first get the length of all `elpd_loo_approx` (N) and subsample length (m), and used the index to extract `epld_loo_approx` that corresponding the subsample. The formula is from Magnusson et al. (2020). More specifically, formula (7), (8), (9).
+
+Here is the formula (7), $elpd_{loo}$:
+
+$$\widehat{elpd}_{diff, loo} = \sum_{i = 1}^{n}\tilde{\pi}_{i} + \frac{n}{m} \sum_{j \in S} (\pi_j - \tilde{\pi}_j)$$
+
+Formula (8), i.e., variance of subsampling:
+
+$$V(\widehat{elpd}_{diff, loo}) = n^2 (1 - \frac{m}{n})\frac{s_e^2}{m})$$
+
+
+where $e_j = \pi_j - \tilde{\pi}_j$ and $s_e^2 = \frac{1}{m-1} \sum_j^m (e_j - \bar{e})^2$ and $\bar{e} = \frac{1}{m} \sum_j^m e_j$. In the code, $s_e^2$ was calculated by $s_e^2 = \frac{1}{m} \sum_j^m (e_j - \bar{e})^2$, thus can be short as $var(e_j)$
+
+Formula 9, the variability of $elpd_{loo}$:
+
+$$\hat{\sigma}_{diff, loo}^2 = \sum_{i = 1}^{n} \tilde{\pi}_i^2 + \frac{n}{m} \sum_{j \in S} (\pi_j^2 - \tilde{\pi}_j^2) + \frac {1}{n} \left[ \left(\frac{n}{m} \sum_{j \in S} (\pi_j - \tilde{\pi}_j \right)^2 - V(\widehat{elpd}_{diff, loo}) \right] + \frac {1}{n} \left[ 2 \left(\sum_{i=1}^{n}\pi_i \right) \widehat{elpd}_{diff, loo} - \left( \sum_{i=1}^{n}\pi_i \right)^2 \right]$$ 
+
+In the `r` code below:
+
+* `e_i`: $e_j = \pi_j - \tilde{\pi}_j$
+* `t_pi_tilde`: $\sum_{i=1}^{n}\tilde{\pi}_i$
+* `t_pi2_tilde`: $\sum_{i=1}^{n}\tilde{\pi}_i^2$
+* `t_e`: $\frac{n}{m}\sum e_j = \frac{n}{m}\sum (\pi_j - \tilde{\pi}_j)$
+* `t_hat_epsilon`: $\frac{n}{m}\sum (\pi_j^2 - \tilde{\pi}_j^2)$
+
+```{r}
+# The forth layer for estimation: srs_diff_est and srs_est
+srs_diff_est <- function(y_approx, y, y_idx) {
+
+  N <- length(y_approx)
+  m <- length(y)
+  y_approx_m <- y_approx[y_idx]
+
+  e_i <- y - y_approx_m
+  t_pi_tilde <- sum(y_approx)
+  t_pi2_tilde <- sum(y_approx^2)
+  t_e <- N * mean(e_i)
+  t_hat_epsilon <- N * mean(y^2 - y_approx_m^2)
+
+  est_list <- list(m = length(y), N = N)
+  est_list$y_hat <- t_pi_tilde + t_e
+  est_list$v_y_hat <- N^2 * (1 - m / N) * var(e_i) / m
+  est_list$hat_v_y <- (t_pi2_tilde + t_hat_epsilon) - # a (has been checked)
+    (1/N) * (t_e^2 - est_list$v_y_hat + 2 * t_pi_tilde * est_list$y_hat - t_pi_tilde^2) # b
+  est_list
+}
+
+```
+
+update `p_loo` for subsampling.
+How `p_loo` is calculated? not find the equations in papers yet.
+
+`srs_est()` calculate `p_loo`'s estimate, SE, and subsampling SE has two inputs: 
+
+* `y`:  `p_loo` from `loo()` function, i.e., `x$pointwise[, "p_loo"]`; 
+* `y_approx`: the elpd_loo_approx, `x$loo_subsampling$elpd_loo_approx`.
+
+```{r}
+srs_est <- function(y, y_approx) {
+  checkmate::assert_numeric(y)
+  checkmate::assert_numeric(y_approx, min.len = length(y))
+  N <- length(y_approx)
+  m <- length(y)
+  est_list <- list(m = m)
+  est_list$y_hat <- N * mean(y)
+  est_list$v_y_hat <- N^2 * (1-m/N) * var(y)/m
+  est_list$hat_v_y <- N * var(y)
+
+  est_list
+}
+```
+
 
 $$e_i = elpd_{loo-m} - elpd_{loo-approx-m} $$
+
 $$\tilde{t_{\pi}} = \sum(elpd_{loo-approx})$$
 $$\tilde{t_{\pi^2}} = \sum((elpd_{loo-approx})^2) $$
 $$t_e = N * mean (e_i)$$
@@ -350,6 +435,34 @@ This the final SE of $elpd_{loo}$:
 $$Var{\hat{y} = N^2 * (1 - m / N) * var(e_i) / m }$$
 This the final subsample SE of $elpd_{loo}$:
 $$\hat{v_{y}} = (\tilde {t_{\pi^2}} + \hat{t_{\epsilon}}) - (1/N) * (t_e^2 - \hat{v_y} + 2 * \tilde {t_{\pi}}  * \hat {y} - \tilde {t_{\pi}}^2)$$
+from `loo_obj` to `loo_ss` object:
+
+(1) Add subsampling variables to the `loo_obj`'s pointwise and formed new pointwise variable:
+
+* `idxs`, the index matrix of subsample, 
+* a subset of `elpd_loo_approx` selected by `idxs`.
+
+(2) create a new list `loo_subsampling`, which records the information related to subsampling
+
+* `elpd_loo_approx`: All `elpd_loo_approx` from previous step 
+* `loo_approxmiation`: methods fro the `elpd_loo_approx`
+* `loo_approximation_draws`
+* `estimator`
+* `.llfun`
+* `.llgrad`
+* `data_dim`:
+* `ndraws`: number of all draws before subsampling
+
+(3) update the `estimates` by `loo_subsample_estimation_*`, which include six items:
+
+* `Estimate`, `SE`, and `subsampling SE` of `elpd_loo`, which estimated by `srs_diff_est()`
+* `Estimate`, `SE`, and `subsampling SE` of `p_loo`, estimated by `srs_est()`
+
+
+(4) update the values using `update_psis_loo_ss_estimates`
+
+* get the `looic` 
+* update `elpd_loo`, `p_loo`, `looic`, `se_elpd_loo`, `se_p_loo`, `se_looic` of `loo_obj`.
 
 ```{r get loo_obj_ss}
 x_tmp <- loo_obj
@@ -367,7 +480,7 @@ x_tmp$loo_subsampling[".llhess"] <- list(NULL)
 x_tmp$loo_subsampling$data_dim <- dim(data)
 x_tmp$loo_subsampling$ndraws <- .ndraws(draws)
 
-## core fucntion of srs_diff_est
+## core function of srs_diff_est
 y_approx_tmp <- x_tmp$loo_subsampling$elpd_loo_approx
 y_tmp <- x_tmp$pointwise[, 'elpd_loo']
 y_idx_tmp <- x_tmp$pointwise[, "idx"]
@@ -511,7 +624,6 @@ loo_subsample_estimation_diff_srs <- function(x) {
 }
 
 # The forth layer for esetimation: srs_diff_est and srs_est
-y_approx <- x_tmp$
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
