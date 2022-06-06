@@ -47,10 +47,10 @@ The example here is a model that predict the well-switching response given two p
 Two-Step for subsampling. Step one is a normal MCMC, using stan, with three input:
 
 * llfun: loglikelihood function;
-* data: 
-* Stan model:
+* data: data
+* Stan model: stan file for a model.
 
-Step two is the subsampleing, the input are:
+Step two is the subsampling, the input are:
 
 * llfun:
 * observation: size of subsample
@@ -74,6 +74,7 @@ llfun_logistic <- function(data_i, draws, log = TRUE) {
 # wells$dist100 <- with(wells, dist / 100)
 load("wells.Rdata")
 
+# write.csv(wells, file = "wells.csv", row.names = F)
 X <- model.matrix(~ dist100 + arsenic, wells)
 standata <- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
 
