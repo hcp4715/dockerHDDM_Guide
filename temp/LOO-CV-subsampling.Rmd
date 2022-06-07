@@ -102,6 +102,10 @@ loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_
 ```
 
 ```{r}
+loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)
+```
+
+```{r}
 start.time <- Sys.time()
 # subsampling
 set.seed(4711)
