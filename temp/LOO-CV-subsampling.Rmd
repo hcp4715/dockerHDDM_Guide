@@ -118,7 +118,7 @@ n_eff_list <-
           X = seq_len(N),
           FUN = function(i) {
             val_i <- llfun_logistic(data_i = data[i, , drop = FALSE], draws = draws)
-            #relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
+            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
           }
         )
 
@@ -126,16 +126,19 @@ data_i <- data[101, , drop = FALSE]
 tmp <- llfun_logistic(data_i = data_i, draws = draws)
 mean(tmp)
 
-data_2 <- data[2, , drop = FALSE]
+data_2 <- data[100, , drop = FALSE]
 tmp2 <- llfun_logistic(data_i = data_2, draws = draws)
 mean(tmp2)
 
-tmp_ <- as.vector(tmp2)
+tmp_ <- as.vector(n_eff_list[[1]])
 
 dim(tmp_) <- c(length(tmp_), 1)
 class(tmp_) <- "matrix"
 
 tmp_0 <- llmatrix_to_array(tmp_, chain_id) # from matrix to 1000 * 4 * 3020 array
+
+tmp_4 <- tmp_0[, , 1] 
+write_csv(as.data.frame(tmp_4), "tmp_1_2.csv", )
 
 length(dim(tmp_0)) == 3
 
@@ -147,6 +150,7 @@ n_eff_vec/S
 
 # import the data from python and check the results
 tmp_py <- as.vector(t(read.csv("tmp.csv")))
+tmp_py <- exp(tmp_py)
 
 dim(tmp_py) <- c(length(tmp_py), 1)
 class(tmp_py) <- "matrix"
