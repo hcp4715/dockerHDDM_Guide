@@ -102,6 +102,11 @@ loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_
 ```
 
 ```{r understand r_eff}
+
+fit_1
+
+log_lik_i <- llfun_logistic(data_i = )
+
 chain_id <- rep(1:4, each=1000)
 data <- stan_df_1
 draws <- parameter_draws_1
@@ -117,7 +122,7 @@ n_eff_list <-
           }
         )
 
-data_i <- data[1, , drop = FALSE]
+data_i <- data[101, , drop = FALSE]
 tmp <- llfun_logistic(data_i = data_i, draws = draws)
 mean(tmp)
 
