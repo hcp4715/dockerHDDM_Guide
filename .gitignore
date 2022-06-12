@@ -1,7 +1,9 @@
 hddm/
 kabuki/
 *chain*
+*RData
 *Rdata
 *netcdf
 *sync.ffs_db
 .Rproj.user
+temp/.RData

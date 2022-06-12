@@ -1880,6 +1880,48 @@ three input:</p>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB3ZSdsbCBhZGQgYW4gYXJndW1lbnQgbG9nIHRvIHRvZ2dsZSB3aGV0aGVyIHRoaXMgaXMgYSBsb2ctbGlrZWxpaG9vZCBvciBcbiMgbGlrZWxpaG9vZCBmdW5jdGlvbi4gdGhpcyB3aWxsIGJlIHVzZWZ1bCBsYXRlciBpbiB0aGUgdmlnbmV0dGUuXG5sbGZ1bl9sb2dpc3RpYyA8LSBmdW5jdGlvbihkYXRhX2ksIGRyYXdzLCBsb2cgPSBUUlVFKSB7XG4gIHhfaSA8LSBhcy5tYXRyaXgoZGF0YV9pWywgd2hpY2goZ3JlcGwoY29sbmFtZXMoZGF0YV9pKSwgcGF0dGVybiA9IFwiWFwiKSksIGRyb3A9RkFMU0VdKVxuICBsb2dpdF9wcmVkIDwtIGRyYXdzICUqJSB0KHhfaSlcbiAgZGJpbm9tKHggPSBkYXRhX2kkeSwgc2l6ZSA9IDEsIHByb2IgPSAxLygxICsgZXhwKC1sb2dpdF9wcmVkKSksIGxvZyA9IGxvZylcbn1cblxuIyBQcmVwYXJlIGRhdGFcbiMgdXJsIDwtIFwiaHR0cDovL3N0YXQuY29sdW1iaWEuZWR1L35nZWxtYW4vYXJtL2V4YW1wbGVzL2Fyc2VuaWMvd2VsbHMuZGF0XCJcbiMgd2VsbHMgPC0gcmVhZC50YWJsZSh1cmwpXG4jIHNhdmUod2VsbHMsIGZpbGUgPSBcIndlbGxzLlJkYXRhXCIpXG4jIHdlbGxzJGRpc3QxMDAgPC0gd2l0aCh3ZWxscywgZGlzdCAvIDEwMClcbmxvYWQoXCJ3ZWxscy5SZGF0YVwiKVxuXG4jIHdyaXRlLmNzdih3ZWxscywgZmlsZSA9IFwid2VsbHMuY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG5YIDwtIG1vZGVsLm1hdHJpeCh+IGRpc3QxMDAgKyBhcnNlbmljLCB3ZWxscylcbnN0YW5kYXRhIDwtIGxpc3QoeSA9IHdlbGxzJHN3aXRjaCwgWCA9IFgsIE4gPSBucm93KFgpLCBQID0gbmNvbChYKSlcblxuIyBDb21waWxlXG5zdGFuX21vZCA8LSBzdGFuX21vZGVsKFwibG9naXN0aWMuc3RhblwiKVxuXG4jIEZpdCBtb2RlbFxuZml0XzEgPC0gc2FtcGxpbmcoc3Rhbl9tb2QsIGRhdGEgPSBzdGFuZGF0YSwgc2VlZCA9IDQ3MTEsIGNvcmVzID0gNClcblxucHJpbnQoZml0XzEsIHBhcnMgPSBcImJldGFcIilcblxucGFyYW1ldGVyX2RyYXdzXzEgPC0gZXh0cmFjdChmaXRfMSkkYmV0YVxuXG4jIHVzZWQgZm9yIGRhdGEgYXJndW1lbnQgdG8gbG9vX2lcbnN0YW5fZGZfMSA8LSBhcy5kYXRhLmZyYW1lKHN0YW5kYXRhKVxuXG5yX2VmZiA8LSByZWxhdGl2ZV9lZmYobGxmdW5fbG9naXN0aWMsIFxuICAgICAgICAgICAgICAgICAgICAgIGxvZyA9IEZBTFNFLCAjIHJlbGF0aXZlX2VmZiB3YW50cyBsaWtlbGlob29kIG5vdCBsb2ctbGlrZWxpaG9vZCB2YWx1ZXNcbiAgICAgICAgICAgICAgICAgICAgICBjaGFpbl9pZCA9IHJlcCgxOjQsIGVhY2ggPSAxMDAwKSwgXG4gICAgICAgICAgICAgICAgICAgICAgZGF0YSA9IHN0YW5fZGZfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA0KVxuXG5sb29faShpID0gMSwgbGxmdW5fbG9naXN0aWMsIHJfZWZmID0gcl9lZmYsIGRhdGEgPSBzdGFuX2RmXzEsIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEpXG5gYGAifQ== -->
+<pre class="r"><code># we&#39;ll add an argument log to toggle whether this is a log-likelihood or 
+# likelihood function. this will be useful later in the vignette.
+llfun_logistic &lt;- function(data_i, draws, log = TRUE) {
+  x_i &lt;- as.matrix(data_i[, which(grepl(colnames(data_i), pattern = &quot;X&quot;)), drop=FALSE])
+  logit_pred &lt;- draws %*% t(x_i)
+  dbinom(x = data_i$y, size = 1, prob = 1/(1 + exp(-logit_pred)), log = log)
+}
+
+# Prepare data
+# url &lt;- &quot;http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat&quot;
+# wells &lt;- read.table(url)
+# save(wells, file = &quot;wells.Rdata&quot;)
+# wells$dist100 &lt;- with(wells, dist / 100)
+load(&quot;wells.Rdata&quot;)
+
+# write.csv(wells, file = &quot;wells.csv&quot;, row.names = F)
+X &lt;- model.matrix(~ dist100 + arsenic, wells)
+standata &lt;- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
+
+# Compile
+stan_mod &lt;- stan_model(&quot;logistic.stan&quot;)
+
+# Fit model
+fit_1 &lt;- sampling(stan_mod, data = standata, seed = 4711, cores = 4)
+
+print(fit_1, pars = &quot;beta&quot;)
+
+parameter_draws_1 &lt;- extract(fit_1)$beta
+
+# used for data argument to loo_i
+stan_df_1 &lt;- as.data.frame(standata)
+
+r_eff &lt;- relative_eff(llfun_logistic, 
+                      log = FALSE, # relative_eff wants likelihood not log-likelihood values
+                      chain_id = rep(1:4, each = 1000), 
+                      data = stan_df_1, 
+                      draws = parameter_draws_1, 
+                      cores = 4)
+
+loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -1895,9 +1937,28 @@ three input:</p>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vKGxsZnVuX2xvZ2lzdGljLCBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBkYXRhID0gc3Rhbl9kZl8xLCByX2VmZiA9IHJfZWZmKVxuYGBgIn0= -->
-<pre class="r"><code>loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vKGxsZnVuX2xvZ2lzdGljLCBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBkYXRhID0gc3Rhbl9kZl8xLCByX2VmZiA9IHJfZWZmKVxuXG5gYGAifQ== -->
+<pre class="r"><code>loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMzAyMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 4000 by 3020 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVXZETUJUTjBzWnRCWFhnSDlnZmFGZ01tOXVqNEFhKytnRjdrOWhHTFhaSmFUUDAxMDl2MG1UVTRncHB6ajAzOTV4Nzc4UGRsaWZiQkNFVW9SakRud0JFNVBscGt5NlJZOUFBeFdoczcyOUlYd0d3enladGhVc01VN1phTE9rOGhGUDRPT1hIa0svNERaMzExRWhXaXFZQk1PbVE4VzF6YjdsRHp5Rm1jN29JZURxakxHRE82SFVyakg5T2EvMDFWbUluZ3pIMjVHamRtR0lualBReGZsejN5c2ExL3FMZDB0RGJTSlpWL2xKcUhmU3JiZ0N3eUU1MG1PVENDUHBXZytnL2ZRNTFaUXF0d0E3YnBaTmU4YUR1RVpkN1pkdkwwK3hqcno1VFpnMWN1ajNuL280NkdMZVdVV2lNZUtrenFkNExKWTh6aUZkWit1QUMxdUMyUUt1NlVDWk1BbXhEalRZaXZFc3lYUWJHellZT3YzbmFoRFJyQWdBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-1968.5","2":"15.6","_rn_":"elpd_loo"},{"1":"3.3","2":"0.1","_rn_":"p_loo"},{"1":"3937.0","2":"31.2","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.0.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
