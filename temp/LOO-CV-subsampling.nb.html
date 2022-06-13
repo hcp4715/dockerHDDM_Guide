@@ -1849,12 +1849,6 @@ A} - \tilde{\pi}_{j, B}\)</span> for all <span class="math inline">\(m\)</span>.
 <h2>Preparation</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdCA9IGxzKCkpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkocnN0YW4pXG5saWJyYXJ5KGxvbylcbmBgYCJ9 -->
-<pre class="r"><code>rm(list = ls())
-library(tidyverse)
-library(rstan)
-library(loo)</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1937,28 +1931,9 @@ loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vKGxsZnVuX2xvZ2lzdGljLCBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBkYXRhID0gc3Rhbl9kZl8xLCByX2VmZiA9IHJfZWZmKVxuXG5gYGAifQ== -->
-<pre class="r"><code>loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vKGxsZnVuX2xvZ2lzdGljLCBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBkYXRhID0gc3Rhbl9kZl8xLCByX2VmZiA9IHJfZWZmKVxuYGBgIn0= -->
+<pre class="r"><code>loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMzAyMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
-<pre><code>
-Computed from 4000 by 3020 log-likelihood matrix</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVXZETUJUTjBzWnRCWFhnSDlnZmFGZ01tOXVqNEFhKytnRjdrOWhHTFhaSmFUUDAxMDl2MG1UVTRncHB6ajAzOTV4Nzc4UGRsaWZiQkNFVW9SakRud0JFNVBscGt5NlJZOUFBeFdoczcyOUlYd0d3enladGhVc01VN1phTE9rOGhGUDRPT1hIa0svNERaMzExRWhXaXFZQk1PbVE4VzF6YjdsRHp5Rm1jN29JZURxakxHRE82SFVyakg5T2EvMDFWbUluZ3pIMjVHamRtR0lualBReGZsejN5c2ExL3FMZDB0RGJTSlpWL2xKcUhmU3JiZ0N3eUU1MG1PVENDUHBXZytnL2ZRNTFaUXF0d0E3YnBaTmU4YUR1RVpkN1pkdkwwK3hqcno1VFpnMWN1ajNuL280NkdMZVdVV2lNZUtrenFkNExKWTh6aUZkWit1QUMxdUMyUUt1NlVDWk1BbXhEalRZaXZFc3lYUWJHellZT3YzbmFoRFJyQWdBQSJ9 -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-1968.5","2":"15.6","_rn_":"elpd_loo"},{"1":"3.3","2":"0.1","_rn_":"p_loo"},{"1":"3937.0","2":"31.2","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
-<pre><code>------
-Monte Carlo SE of elpd_loo is 0.0.
-
-All Pareto k estimates are good (k &lt; 0.5).
-See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
