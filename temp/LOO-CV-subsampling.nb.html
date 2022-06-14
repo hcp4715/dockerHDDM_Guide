@@ -1849,6 +1849,12 @@ A} - \tilde{\pi}_{j, B}\)</span> for all <span class="math inline">\(m\)</span>.
 <h2>Preparation</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdCA9IGxzKCkpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkocnN0YW4pXG5saWJyYXJ5KGxvbylcbmBgYCJ9 -->
+<pre class="r"><code>rm(list = ls())
+library(tidyverse)
+library(rstan)
+library(loo)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1874,7 +1880,7 @@ three input:</p>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB3ZSdsbCBhZGQgYW4gYXJndW1lbnQgbG9nIHRvIHRvZ2dsZSB3aGV0aGVyIHRoaXMgaXMgYSBsb2ctbGlrZWxpaG9vZCBvciBcbiMgbGlrZWxpaG9vZCBmdW5jdGlvbi4gdGhpcyB3aWxsIGJlIHVzZWZ1bCBsYXRlciBpbiB0aGUgdmlnbmV0dGUuXG5sbGZ1bl9sb2dpc3RpYyA8LSBmdW5jdGlvbihkYXRhX2ksIGRyYXdzLCBsb2cgPSBUUlVFKSB7XG4gIHhfaSA8LSBhcy5tYXRyaXgoZGF0YV9pWywgd2hpY2goZ3JlcGwoY29sbmFtZXMoZGF0YV9pKSwgcGF0dGVybiA9IFwiWFwiKSksIGRyb3A9RkFMU0VdKVxuICBsb2dpdF9wcmVkIDwtIGRyYXdzICUqJSB0KHhfaSlcbiAgZGJpbm9tKHggPSBkYXRhX2kkeSwgc2l6ZSA9IDEsIHByb2IgPSAxLygxICsgZXhwKC1sb2dpdF9wcmVkKSksIGxvZyA9IGxvZylcbn1cblxuIyBQcmVwYXJlIGRhdGFcbiMgdXJsIDwtIFwiaHR0cDovL3N0YXQuY29sdW1iaWEuZWR1L35nZWxtYW4vYXJtL2V4YW1wbGVzL2Fyc2VuaWMvd2VsbHMuZGF0XCJcbiMgd2VsbHMgPC0gcmVhZC50YWJsZSh1cmwpXG4jIHNhdmUod2VsbHMsIGZpbGUgPSBcIndlbGxzLlJkYXRhXCIpXG4jIHdlbGxzJGRpc3QxMDAgPC0gd2l0aCh3ZWxscywgZGlzdCAvIDEwMClcbmxvYWQoXCJ3ZWxscy5SZGF0YVwiKVxuXG4jIHdyaXRlLmNzdih3ZWxscywgZmlsZSA9IFwid2VsbHMuY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG5YIDwtIG1vZGVsLm1hdHJpeCh+IGRpc3QxMDAgKyBhcnNlbmljLCB3ZWxscylcbnN0YW5kYXRhIDwtIGxpc3QoeSA9IHdlbGxzJHN3aXRjaCwgWCA9IFgsIE4gPSBucm93KFgpLCBQID0gbmNvbChYKSlcblxuIyBDb21waWxlXG5zdGFuX21vZCA8LSBzdGFuX21vZGVsKFwibG9naXN0aWMuc3RhblwiKVxuXG4jIEZpdCBtb2RlbFxuZml0XzEgPC0gc2FtcGxpbmcoc3Rhbl9tb2QsIGRhdGEgPSBzdGFuZGF0YSwgc2VlZCA9IDQ3MTEsIGNvcmVzID0gNClcblxucHJpbnQoZml0XzEsIHBhcnMgPSBcImJldGFcIilcblxucGFyYW1ldGVyX2RyYXdzXzEgPC0gZXh0cmFjdChmaXRfMSkkYmV0YVxuXG4jIHVzZWQgZm9yIGRhdGEgYXJndW1lbnQgdG8gbG9vX2lcbnN0YW5fZGZfMSA8LSBhcy5kYXRhLmZyYW1lKHN0YW5kYXRhKVxuXG5yX2VmZiA8LSByZWxhdGl2ZV9lZmYobGxmdW5fbG9naXN0aWMsIFxuICAgICAgICAgICAgICAgICAgICAgIGxvZyA9IEZBTFNFLCAjIHJlbGF0aXZlX2VmZiB3YW50cyBsaWtlbGlob29kIG5vdCBsb2ctbGlrZWxpaG9vZCB2YWx1ZXNcbiAgICAgICAgICAgICAgICAgICAgICBjaGFpbl9pZCA9IHJlcCgxOjQsIGVhY2ggPSAxMDAwKSwgXG4gICAgICAgICAgICAgICAgICAgICAgZGF0YSA9IHN0YW5fZGZfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA0KVxuXG5sb29faShpID0gMSwgbGxmdW5fbG9naXN0aWMsIHJfZWZmID0gcl9lZmYsIGRhdGEgPSBzdGFuX2RmXzEsIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB3ZSdsbCBhZGQgYW4gYXJndW1lbnQgbG9nIHRvIHRvZ2dsZSB3aGV0aGVyIHRoaXMgaXMgYSBsb2ctbGlrZWxpaG9vZCBvciBcbiMgbGlrZWxpaG9vZCBmdW5jdGlvbi4gdGhpcyB3aWxsIGJlIHVzZWZ1bCBsYXRlciBpbiB0aGUgdmlnbmV0dGUuXG5sbGZ1bl9sb2dpc3RpYyA8LSBmdW5jdGlvbihkYXRhX2ksIGRyYXdzLCBsb2cgPSBUUlVFKSB7XG4gIHhfaSA8LSBhcy5tYXRyaXgoZGF0YV9pWywgd2hpY2goZ3JlcGwoY29sbmFtZXMoZGF0YV9pKSwgcGF0dGVybiA9IFwiWFwiKSksIGRyb3A9RkFMU0VdKVxuICBsb2dpdF9wcmVkIDwtIGRyYXdzICUqJSB0KHhfaSlcbiAgZGJpbm9tKHggPSBkYXRhX2kkeSwgc2l6ZSA9IDEsIHByb2IgPSAxLygxICsgZXhwKC1sb2dpdF9wcmVkKSksIGxvZyA9IGxvZylcbn1cblxuIyBQcmVwYXJlIGRhdGFcbiMgdXJsIDwtIFwiaHR0cDovL3N0YXQuY29sdW1iaWEuZWR1L35nZWxtYW4vYXJtL2V4YW1wbGVzL2Fyc2VuaWMvd2VsbHMuZGF0XCJcbiMgd2VsbHMgPC0gcmVhZC50YWJsZSh1cmwpXG4jIHNhdmUod2VsbHMsIGZpbGUgPSBcIndlbGxzLlJkYXRhXCIpXG4jIHdlbGxzJGRpc3QxMDAgPC0gd2l0aCh3ZWxscywgZGlzdCAvIDEwMClcbmxvYWQoXCJ3ZWxscy5SZGF0YVwiKVxuXG4jIHdyaXRlLmNzdih3ZWxscywgZmlsZSA9IFwid2VsbHMuY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG5YIDwtIG1vZGVsLm1hdHJpeCh+IGRpc3QxMDAgKyBhcnNlbmljLCB3ZWxscylcbnN0YW5kYXRhIDwtIGxpc3QoeSA9IHdlbGxzJHN3aXRjaCwgWCA9IFgsIE4gPSBucm93KFgpLCBQID0gbmNvbChYKSlcblxuIyBDb21waWxlXG5zdGFuX21vZCA8LSBzdGFuX21vZGVsKFwibG9naXN0aWMuc3RhblwiKVxuYGBgIn0= -->
 <pre class="r"><code># we&#39;ll add an argument log to toggle whether this is a log-likelihood or 
 # likelihood function. this will be useful later in the vignette.
 llfun_logistic &lt;- function(data_i, draws, log = TRUE) {
@@ -1895,14 +1901,142 @@ X &lt;- model.matrix(~ dist100 + arsenic, wells)
 standata &lt;- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
 
 # Compile
-stan_mod &lt;- stan_model(&quot;logistic.stan&quot;)
+stan_mod &lt;- stan_model(&quot;logistic.stan&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZyBpbiByZWFkTGluZXMoZmlsZSwgd2FybiA9IFRSVUUpIDpcbiAgaW5jb21wbGV0ZSBmaW5hbCBsaW5lIGZvdW5kIG9uICcvaG9tZS9oY3A0NzE1L0RETV9ndWlkZS90ZW1wL2xvZ2lzdGljLnN0YW4nXG4ifQ== -->
+<pre><code>Warning in readLines(file, warn = TRUE) :
+  incomplete final line found on &#39;/home/hcp4715/DDM_guide/temp/logistic.stan&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBGaXQgbW9kZWxcbmZpdF8xIDwtIHNhbXBsaW5nKHN0YW5fbW9kLCBkYXRhID0gc3RhbmRhdGEsIHNlZWQgPSA0NzExLCBjb3JlcyA9IDQpXG5gYGAifQ== -->
+<pre class="r"><code># Fit model
+fit_1 &lt;- sampling(stan_mod, data = standata, seed = 4711, cores = 4)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD05NTY3IG9uIGxvY2FsaG9zdDoxMTM3NSBhdCAwODowNTo0NC40MzVcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9OTU4MSBvbiBsb2NhbGhvc3Q6MTEzNzUgYXQgMDg6MDU6NDQuNTk5XG5zdGFydGluZyB3b3JrZXIgcGlkPTk1OTUgb24gbG9jYWxob3N0OjExMzc1IGF0IDA4OjA1OjQ0Ljc1MFxuc3RhcnRpbmcgd29ya2VyIHBpZD05NjA5IG9uIGxvY2FsaG9zdDoxMTM3NSBhdCAwODowNTo0NC45MDZcblxuU0FNUExJTkcgRk9SIE1PREVMICdsb2dpc3RpYycgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwMjI1IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAyLjI1IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgICAxIC8gMjAwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICAyMDAgLyAyMDAwIFsgMTAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdsb2dpc3RpYycgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwMjMgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDIuMyBzZWNvbmRzLlxuQ2hhaW4gMjogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMjogXG5DaGFpbiAyOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogICAgMSAvIDIwMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAwIC8gMjAwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICAyMDAgLyAyMDAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDYwMCAvIDIwMDAgWyAzMCVdICAoV2FybXVwKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ2xvZ2lzdGljJyBOT1cgKENIQUlOIDMpLlxuQ2hhaW4gMzogXG5DaGFpbiAzOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgMC4wMDAyNDUgc2Vjb25kc1xuQ2hhaW4gMzogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDIuNDUgc2Vjb25kcy5cbkNoYWluIDM6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDM6IFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgIDEgLyAyMDAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDQwMCAvIDIwMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAwIC8gMjAwMCBbIDQwJV0gIChXYXJtdXApXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbG9naXN0aWMnIE5PVyAoQ0hBSU4gNCkuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDMyMSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMy4yMSBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogICAgMSAvIDIwMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAwIC8gMjAwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMDAgLyAyMDAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTAwMCAvIDIwMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAxIC8gMjAwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDgwMCAvIDIwMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgMjAwIC8gMjAwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MDAgLyAyMDAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAwMCAvIDIwMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAxIC8gMjAwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTIwMCAvIDIwMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MDAgLyAyMDAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDYwMCAvIDIwMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMjAwIC8gMjAwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwMCAvIDIwMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MDAgLyAyMDAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwMCAvIDIwMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNDAwIC8gMjAwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTYwMCAvIDIwMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246ICA4MDAgLyAyMDAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwMCAvIDIwMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDAxIC8gMjAwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwMCAvIDIwMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MDAgLyAyMDAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMDAwIC8gMjAwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMDEgLyAyMDAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMjAwIC8gMjAwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTgwMCAvIDIwMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDIwMDAgLyAyMDAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAyLjMzMjgzIHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAyLjYwMDQ1IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgNC45MzMyOCBzZWNvbmRzIChUb3RhbClcbkNoYWluIDE6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNDAwIC8gMjAwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwMCAvIDIwMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDIwMDAgLyAyMDAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAyLjE5MDQ2IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAyLjQ1NDg5IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgNC42NDUzNSBzZWNvbmRzIChUb3RhbClcbkNoYWluIDI6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNjAwIC8gMjAwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTQwMCAvIDIwMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE4MDAgLyAyMDAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxNjAwIC8gMjAwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMjAwMCAvIDIwMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDIuNDc5OTMgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDIuNDYxMzggc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAzOiAgICAgICAgICAgICAgICA0Ljk0MTMxIHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMzogXG5DaGFpbiA0OiBJdGVyYXRpb246IDE4MDAgLyAyMDAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAwIC8gMjAwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IFxuQ2hhaW4gNDogIEVsYXBzZWQgVGltZTogMi4zOTE5MyBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMi40OTQwOSBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDQuODg2MDIgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=9567 on localhost:11375 at 08:05:44.435
+starting worker pid=9581 on localhost:11375 at 08:05:44.599
+starting worker pid=9595 on localhost:11375 at 08:05:44.750
+starting worker pid=9609 on localhost:11375 at 08:05:44.906
 
-# Fit model
-fit_1 &lt;- sampling(stan_mod, data = standata, seed = 4711, cores = 4)
+SAMPLING FOR MODEL &#39;logistic&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000225 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.25 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
 
-print(fit_1, pars = &quot;beta&quot;)
+SAMPLING FOR MODEL &#39;logistic&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0.00023 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 2.3 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
 
-parameter_draws_1 &lt;- extract(fit_1)$beta
+SAMPLING FOR MODEL &#39;logistic&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000245 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 2.45 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;logistic&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 0.000321 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 3.21 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 2.33283 seconds (Warm-up)
+Chain 1:                2.60045 seconds (Sampling)
+Chain 1:                4.93328 seconds (Total)
+Chain 1: 
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 2.19046 seconds (Warm-up)
+Chain 2:                2.45489 seconds (Sampling)
+Chain 2:                4.64535 seconds (Total)
+Chain 2: 
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 2.47993 seconds (Warm-up)
+Chain 3:                2.46138 seconds (Sampling)
+Chain 3:                4.94131 seconds (Total)
+Chain 3: 
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 2.39193 seconds (Warm-up)
+Chain 4:                2.49409 seconds (Sampling)
+Chain 4:                4.88602 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoZml0XzEsIHBhcnMgPSBcImJldGFcIilcbmBgYCJ9 -->
+<pre class="r"><code>print(fit_1, pars = &quot;beta&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW5mZXJlbmNlIGZvciBTdGFuIG1vZGVsOiBsb2dpc3RpYy5cbjQgY2hhaW5zLCBlYWNoIHdpdGggaXRlcj0yMDAwOyB3YXJtdXA9MTAwMDsgdGhpbj0xOyBcbnBvc3Qtd2FybXVwIGRyYXdzIHBlciBjaGFpbj0xMDAwLCB0b3RhbCBwb3N0LXdhcm11cCBkcmF3cz00MDAwLlxuXG4gICAgICAgICBtZWFuIHNlX21lYW4gICBzZCAgMi41JSAgIDI1JSAgIDUwJSAgIDc1JSA5Ny41JSBuX2VmZiBSaGF0XG5iZXRhWzFdICAwLjAwICAgICAgIDAgMC4wOCAtMC4xNSAtMC4wNSAgMC4wMCAgMC4wNSAgMC4xNiAgMTk5MiAgICAxXG5iZXRhWzJdIC0wLjg5ICAgICAgIDAgMC4xMSAtMS4wOSAtMC45NiAtMC44OSAtMC44MiAtMC42OCAgMjE4MiAgICAxXG5iZXRhWzNdICAwLjQ2ICAgICAgIDAgMC4wNCAgMC4zOCAgMC40MyAgMC40NiAgMC40OSAgMC41NCAgMTU5OCAgICAxXG5cblNhbXBsZXMgd2VyZSBkcmF3biB1c2luZyBOVVRTKGRpYWdfZSkgYXQgVHVlIEp1biAxNCAwODowNTo1NiAyMDIyLlxuRm9yIGVhY2ggcGFyYW1ldGVyLCBuX2VmZiBpcyBhIGNydWRlIG1lYXN1cmUgb2YgZWZmZWN0aXZlIHNhbXBsZSBzaXplLFxuYW5kIFJoYXQgaXMgdGhlIHBvdGVudGlhbCBzY2FsZSByZWR1Y3Rpb24gZmFjdG9yIG9uIHNwbGl0IGNoYWlucyAoYXQgXG5jb252ZXJnZW5jZSwgUmhhdD0xKS5cbiJ9 -->
+<pre><code>Inference for Stan model: logistic.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
+beta[1]  0.00       0 0.08 -0.15 -0.05  0.00  0.05  0.16  1992    1
+beta[2] -0.89       0 0.11 -1.09 -0.96 -0.89 -0.82 -0.68  2182    1
+beta[3]  0.46       0 0.04  0.38  0.43  0.46  0.49  0.54  1598    1
+
+Samples were drawn using NUTS(diag_e) at Tue Jun 14 08:05:56 2022.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFyYW1ldGVyX2RyYXdzXzEgPC0gZXh0cmFjdChmaXRfMSkkYmV0YVxuXG4jIHVzZWQgZm9yIGRhdGEgYXJndW1lbnQgdG8gbG9vX2lcbnN0YW5fZGZfMSA8LSBhcy5kYXRhLmZyYW1lKHN0YW5kYXRhKVxuXG5yX2VmZiA8LSByZWxhdGl2ZV9lZmYobGxmdW5fbG9naXN0aWMsIFxuICAgICAgICAgICAgICAgICAgICAgIGxvZyA9IEZBTFNFLCAjIHJlbGF0aXZlX2VmZiB3YW50cyBsaWtlbGlob29kIG5vdCBsb2ctbGlrZWxpaG9vZCB2YWx1ZXNcbiAgICAgICAgICAgICAgICAgICAgICBjaGFpbl9pZCA9IHJlcCgxOjQsIGVhY2ggPSAxMDAwKSwgXG4gICAgICAgICAgICAgICAgICAgICAgZGF0YSA9IHN0YW5fZGZfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA0KVxuXG5sb29faShpID0gMSwgbGxmdW5fbG9naXN0aWMsIHJfZWZmID0gcl9lZmYsIGRhdGEgPSBzdGFuX2RmXzEsIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEpXG5gYGAifQ== -->
+<pre class="r"><code>parameter_draws_1 &lt;- extract(fit_1)$beta
 
 # used for data argument to loo_i
 stan_df_1 &lt;- as.data.frame(standata)
@@ -1916,6 +2050,27 @@ r_eff &lt;- relative_eff(llfun_logistic,
 
 loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJHBvaW50d2lzZVxuICAgIGVscGRfbG9vIG1jc2VfZWxwZF9sb28gICAgICAgIHBfbG9vICAgICBsb29pYyBpbmZsdWVuY2VfcGFyZXRvX2tcbjEgLTAuMzMxMzUyOSAgIDAuMDAwMzA0NDYzIDAuMDAwMzU3Njg2MSAwLjY2MjcwNTggICAgICAgIC0wLjA1MTQ1Njc2XG5cbiRkaWFnbm9zdGljc1xuJGRpYWdub3N0aWNzJHBhcmV0b19rXG5bMV0gLTAuMDUxNDU2NzZcblxuJGRpYWdub3N0aWNzJG5fZWZmXG5bMV0gMzg1Mi43MTJcblxuXG4kcHNpc19vYmplY3Rcbk5VTExcblxuYXR0cigsXCJTXCIpXG5bMV0gNDAwMFxuYXR0cigsXCJOXCIpXG5bMV0gMVxuIn0= -->
+<pre><code>$pointwise
+    elpd_loo mcse_elpd_loo        p_loo     looic influence_pareto_k
+1 -0.3313529   0.000304463 0.0003576861 0.6627058        -0.05145676
+
+$diagnostics
+$diagnostics$pareto_k
+[1] -0.05145676
+
+$diagnostics$n_eff
+[1] 3852.712
+
+
+$psis_object
+NULL
+
+attr(,&quot;S&quot;)
+[1] 4000
+attr(,&quot;N&quot;)
+[1] 1</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
