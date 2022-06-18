@@ -1880,53 +1880,78 @@ three input:</p>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucl9lZmYgPC0gcmVsYXRpdmVfZWZmKGxsZnVuX2xvZ2lzdGljLCBcbiAgICAgICAgICAgICAgICAgICAgICBsb2cgPSBGQUxTRSwgIyByZWxhdGl2ZV9lZmYgd2FudHMgbGlrZWxpaG9vZCBub3QgbG9nLWxpa2VsaWhvb2QgdmFsdWVzXG4gICAgICAgICAgICAgICAgICAgICAgY2hhaW5faWQgPSByZXAoMTo0LCBlYWNoID0gMTAwMCksIFxuICAgICAgICAgICAgICAgICAgICAgIGRhdGEgPSBzdGFuX2RmXzEsIFxuICAgICAgICAgICAgICAgICAgICAgIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEsIFxuICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gNClcbnJfZWZmIDwtIHJlbGF0aXZlX2VmZihsbGZ1bl9sb2dpc3RpYywgXG4gICAgICAgICAgICAgICAgICAgICAgbG9nID0gRkFMU0UsICMgcmVsYXRpdmVfZWZmIHdhbnRzIGxpa2VsaWhvb2Qgbm90IGxvZy1saWtlbGlob29kIHZhbHVlc1xuICAgICAgICAgICAgICAgICAgICAgIGNoYWluX2lkID0gcmVwKDE6NCwgZWFjaCA9IDEwMDApLCBcbiAgICAgICAgICAgICAgICAgICAgICBkYXRhID0gc3Rhbl9kZl8xLCBcbiAgICAgICAgICAgICAgICAgICAgICBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBcbiAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDQpXG5sb29faShpID0gMSwgbGxmdW5fbG9naXN0aWMsIHJfZWZmID0gcl9lZmYsIGRhdGEgPSBzdGFuX2RmXzEsIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEpXG5cbmBgYCJ9 -->
-<pre class="r"><code>r_eff &lt;- relative_eff(llfun_logistic, 
-                      log = FALSE, # relative_eff wants likelihood not log-likelihood values
-                      chain_id = rep(1:4, each = 1000), 
-                      data = stan_df_1, 
-                      draws = parameter_draws_1, 
-                      cores = 4)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB3ZSdsbCBhZGQgYW4gYXJndW1lbnQgbG9nIHRvIHRvZ2dsZSB3aGV0aGVyIHRoaXMgaXMgYSBsb2ctbGlrZWxpaG9vZCBvciBcbiMgbGlrZWxpaG9vZCBmdW5jdGlvbi4gdGhpcyB3aWxsIGJlIHVzZWZ1bCBsYXRlciBpbiB0aGUgdmlnbmV0dGUuXG5sbGZ1bl9sb2dpc3RpYyA8LSBmdW5jdGlvbihkYXRhX2ksIGRyYXdzLCBsb2cgPSBUUlVFKSB7XG4gIHhfaSA8LSBhcy5tYXRyaXgoZGF0YV9pWywgd2hpY2goZ3JlcGwoY29sbmFtZXMoZGF0YV9pKSwgcGF0dGVybiA9IFwiWFwiKSksIGRyb3A9RkFMU0VdKVxuICBsb2dpdF9wcmVkIDwtIGRyYXdzICUqJSB0KHhfaSlcbiAgZGJpbm9tKHggPSBkYXRhX2kkeSwgc2l6ZSA9IDEsIHByb2IgPSAxLygxICsgZXhwKC1sb2dpdF9wcmVkKSksIGxvZyA9IGxvZylcbn1cblxuIyBQcmVwYXJlIGRhdGFcbiMgdXJsIDwtIFwiaHR0cDovL3N0YXQuY29sdW1iaWEuZWR1L35nZWxtYW4vYXJtL2V4YW1wbGVzL2Fyc2VuaWMvd2VsbHMuZGF0XCJcbiMgd2VsbHMgPC0gcmVhZC50YWJsZSh1cmwpXG4jIHNhdmUod2VsbHMsIGZpbGUgPSBcIndlbGxzLlJkYXRhXCIpXG4jIHdlbGxzJGRpc3QxMDAgPC0gd2l0aCh3ZWxscywgZGlzdCAvIDEwMClcbmxvYWQoXCJ3ZWxscy5SZGF0YVwiKVxuXG4jIHdyaXRlLmNzdih3ZWxscywgZmlsZSA9IFwid2VsbHMuY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG5YIDwtIG1vZGVsLm1hdHJpeCh+IGRpc3QxMDAgKyBhcnNlbmljLCB3ZWxscylcbnN0YW5kYXRhIDwtIGxpc3QoeSA9IHdlbGxzJHN3aXRjaCwgWCA9IFgsIE4gPSBucm93KFgpLCBQID0gbmNvbChYKSlcblxuIyBDb21waWxlXG5zdGFuX21vZCA8LSBzdGFuX21vZGVsKFwibG9naXN0aWMuc3RhblwiKVxuXG4jIEZpdCBtb2RlbFxuZml0XzEgPC0gc2FtcGxpbmcoc3Rhbl9tb2QsIGRhdGEgPSBzdGFuZGF0YSwgc2VlZCA9IDQ3MTEsIGNvcmVzID0gNClcblxucHJpbnQoZml0XzEsIHBhcnMgPSBcImJldGFcIilcblxucGFyYW1ldGVyX2RyYXdzXzEgPC0gZXh0cmFjdChmaXRfMSkkYmV0YVxuXG4jIHVzZWQgZm9yIGRhdGEgYXJndW1lbnQgdG8gbG9vX2lcbnN0YW5fZGZfMSA8LSBhcy5kYXRhLmZyYW1lKHN0YW5kYXRhKVxuXG5yX2VmZiA8LSByZWxhdGl2ZV9lZmYobGxmdW5fbG9naXN0aWMsIFxuICAgICAgICAgICAgICAgICAgICAgIGxvZyA9IEZBTFNFLCAjIHJlbGF0aXZlX2VmZiB3YW50cyBsaWtlbGlob29kIG5vdCBsb2ctbGlrZWxpaG9vZCB2YWx1ZXNcbiAgICAgICAgICAgICAgICAgICAgICBjaGFpbl9pZCA9IHJlcCgxOjQsIGVhY2ggPSAxMDAwKSwgXG4gICAgICAgICAgICAgICAgICAgICAgZGF0YSA9IHN0YW5fZGZfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSwgXG4gICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA0KVxuXG5sb29faShpID0gMSwgbGxmdW5fbG9naXN0aWMsIHJfZWZmID0gcl9lZmYsIGRhdGEgPSBzdGFuX2RmXzEsIGRyYXdzID0gcGFyYW1ldGVyX2RyYXdzXzEpXG5gYGAifQ== -->
+<pre class="r"><code># we&#39;ll add an argument log to toggle whether this is a log-likelihood or 
+# likelihood function. this will be useful later in the vignette.
+llfun_logistic &lt;- function(data_i, draws, log = TRUE) {
+  x_i &lt;- as.matrix(data_i[, which(grepl(colnames(data_i), pattern = &quot;X&quot;)), drop=FALSE])
+  logit_pred &lt;- draws %*% t(x_i)
+  dbinom(x = data_i$y, size = 1, prob = 1/(1 + exp(-logit_pred)), log = log)
+}
+
+# Prepare data
+# url &lt;- &quot;http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat&quot;
+# wells &lt;- read.table(url)
+# save(wells, file = &quot;wells.Rdata&quot;)
+# wells$dist100 &lt;- with(wells, dist / 100)
+load(&quot;wells.Rdata&quot;)
+
+# write.csv(wells, file = &quot;wells.csv&quot;, row.names = F)
+X &lt;- model.matrix(~ dist100 + arsenic, wells)
+standata &lt;- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
+
+# Compile
+stan_mod &lt;- stan_model(&quot;logistic.stan&quot;)
+
+# Fit model
+fit_1 &lt;- sampling(stan_mod, data = standata, seed = 4711, cores = 4)
+
+print(fit_1, pars = &quot;beta&quot;)
+
+parameter_draws_1 &lt;- extract(fit_1)$beta
+
+# used for data argument to loo_i
+stan_df_1 &lt;- as.data.frame(standata)
+
 r_eff &lt;- relative_eff(llfun_logistic, 
                       log = FALSE, # relative_eff wants likelihood not log-likelihood values
                       chain_id = rep(1:4, each = 1000), 
                       data = stan_df_1, 
                       draws = parameter_draws_1, 
                       cores = 4)
-loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)
-</code></pre>
+
+loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJHBvaW50d2lzZVxuICAgIGVscGRfbG9vIG1jc2VfZWxwZF9sb28gICAgICAgIHBfbG9vICAgICBsb29pYyBpbmZsdWVuY2VfcGFyZXRvX2tcbjEgLTAuMzMxMzUyOSAgMC4wMDAzMDIzMDU2IDAuMDAwMzU3Njc0OSAwLjY2MjcwNTcgICAgICAgIC0wLjA0Njg0ODk2XG5cbiRkaWFnbm9zdGljc1xuJGRpYWdub3N0aWNzJHBhcmV0b19rXG5bMV0gLTAuMDQ2ODQ4OTZcblxuJGRpYWdub3N0aWNzJG5fZWZmXG5bMV0gMzkwNy44ODNcblxuXG4kcHNpc19vYmplY3Rcbk5VTExcblxuYXR0cigsXCJTXCIpXG5bMV0gNDAwMFxuYXR0cigsXCJOXCIpXG5bMV0gMVxuIn0= -->
-<pre><code>$pointwise
-    elpd_loo mcse_elpd_loo        p_loo     looic influence_pareto_k
-1 -0.3313529  0.0003023056 0.0003576749 0.6627057        -0.04684896
-
-$diagnostics
-$diagnostics$pareto_k
-[1] -0.04684896
-
-$diagnostics$n_eff
-[1] 3907.883
-
-
-$psis_object
-NULL
-
-attr(,&quot;S&quot;)
-[1] 4000
-attr(,&quot;N&quot;)
-[1] 1</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubl9lZmZfdmVjL1MgXG5cbmBgYCJ9 -->
-<pre class="r"><code>n_eff_vec/S 
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5maXRfMVxuYGBgIn0= -->
+<pre class="r"><code>
+fit_1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuNjEzNjIyNlxuIn0= -->
-<pre><code>[1] 0.6136226</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiSW5mZXJlbmNlIGZvciBTdGFuIG1vZGVsOiBsb2dpc3RpYy5cbjQgY2hhaW5zLCBlYWNoIHdpdGggaXRlcj0yMDAwOyB3YXJtdXA9MTAwMDsgdGhpbj0xOyBcbnBvc3Qtd2FybXVwIGRyYXdzIHBlciBjaGFpbj0xMDAwLCB0b3RhbCBwb3N0LXdhcm11cCBkcmF3cz00MDAwLlxuXG4gICAgICAgICAgICBtZWFuIHNlX21lYW4gICBzZCAgICAgMi41JSAgICAgIDI1JSAgICAgIDUwJSAgICAgIDc1JSAgICA5Ny41JSBuX2VmZiBSaGF0XG5iZXRhWzFdICAgICAwLjAwICAgIDAuMDAgMC4wOCAgICAtMC4xNSAgICAtMC4wNSAgICAgMC4wMCAgICAgMC4wNSAgICAgMC4xNiAgMTk5MiAgICAxXG5iZXRhWzJdICAgIC0wLjg5ICAgIDAuMDAgMC4xMSAgICAtMS4wOSAgICAtMC45NiAgICAtMC44OSAgICAtMC44MiAgICAtMC42OCAgMjE4MiAgICAxXG5iZXRhWzNdICAgICAwLjQ2ICAgIDAuMDAgMC4wNCAgICAgMC4zOCAgICAgMC40MyAgICAgMC40NiAgICAgMC40OSAgICAgMC41NCAgMTU5OCAgICAxXG5scF9fICAgIC0xOTY3LjM3ICAgIDAuMDMgMS4yNiAtMTk3MC43NSAtMTk2Ny45NCAtMTk2Ny4wNiAtMTk2Ni40NiAtMTk2NS45NSAgMTcyNSAgICAxXG5cblNhbXBsZXMgd2VyZSBkcmF3biB1c2luZyBOVVRTKGRpYWdfZSkgYXQgRnJpIEp1biAxNyAwOToxNjozOSAyMDIyLlxuRm9yIGVhY2ggcGFyYW1ldGVyLCBuX2VmZiBpcyBhIGNydWRlIG1lYXN1cmUgb2YgZWZmZWN0aXZlIHNhbXBsZSBzaXplLFxuYW5kIFJoYXQgaXMgdGhlIHBvdGVudGlhbCBzY2FsZSByZWR1Y3Rpb24gZmFjdG9yIG9uIHNwbGl0IGNoYWlucyAoYXQgXG5jb252ZXJnZW5jZSwgUmhhdD0xKS5cbiJ9 -->
+<pre><code>Inference for Stan model: logistic.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+            mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat
+beta[1]     0.00    0.00 0.08    -0.15    -0.05     0.00     0.05     0.16  1992    1
+beta[2]    -0.89    0.00 0.11    -1.09    -0.96    -0.89    -0.82    -0.68  2182    1
+beta[3]     0.46    0.00 0.04     0.38     0.43     0.46     0.49     0.54  1598    1
+lp__    -1967.37    0.03 1.26 -1970.75 -1967.94 -1967.06 -1966.46 -1965.95  1725    1
+
+Samples were drawn using NUTS(diag_e) at Fri Jun 17 09:16:39 2022.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9nX2xpa19pIDwtIGxsZnVuX2xvZ2lzdGljKGRhdGFfaSA9IClcbmBgYCJ9 -->
+<pre class="r"><code>log_lik_i &lt;- llfun_logistic(data_i = )</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gYXMubWF0cml4KGRhdGFfaVssIHdoaWNoKGdyZXBsKGNvbG5hbWVzKGRhdGFfaSksIHBhdHRlcm4gPSBcIlhcIikpLCAgOiBcbiAgYXJndW1lbnQgXCJkYXRhX2lcIiBpcyBtaXNzaW5nLCB3aXRoIG5vIGRlZmF1bHRcbiJ9 -->
+<pre><code>Error in as.matrix(data_i[, which(grepl(colnames(data_i), pattern = &quot;X&quot;)),  : 
+  argument &quot;data_i&quot; is missing, with no default</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1935,6 +1960,24 @@ attr(,&quot;N&quot;)
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vKGxsZnVuX2xvZ2lzdGljLCBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLCBkYXRhID0gc3Rhbl9kZl8xLCByX2VmZiA9IHJfZWZmKVxuYGBgIn0= -->
 <pre class="r"><code>loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMzAyMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 4000 by 3020 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVXZETUJUTjBzWnRCWFhnSDlnZmFGZ01tOXVqNEFhKytnRjdrOWhHTFhaSmFUUDAxMDl2MG1UVTRncHB6ajAzOTV4Nzc4UGRsaWZiQkNFVW9SakRud0JFNVBscGt5NlJZOUFBeFdoczcyOUlYd0d3enladGhVc01VN1phTE9rOGhGUDRPT1hIa0svNERaMzExRWhXaXFZQk1PbVE4VzF6YjdsRHp5Rm1jN29JZURxakxHRE82SFVyakg5T2EvMDFWbUluZ3pIMjVHamRtR0lualBReGZsejN5c2ExL3FMZDB0RGJTSlpWL2xKcUhmU3JiZ0N3eUU1MG1PVENDUHBXZytnL2ZRNTFaUXF0d0E3YnBaTmU4YUR1RVpkN1pkdkwwK3hqcno1VFpnMWN1ajNuL280NkdMZVdVV2lNZUtrenFkNExKWTh6aUZkWit1QUMxdUMyUUt1NlVDWk1BbXhEalRZaXZFc3lYUWJHellZT3YzbmFoRFJyQWdBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-1968.5","2":"15.6","_rn_":"elpd_loo"},{"1":"3.3","2":"0.1","_rn_":"p_loo"},{"1":"3937.0","2":"31.2","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.0.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -1956,8 +1999,8 @@ loo_ss_1 &lt;-
 time_loo_ss_1 &lt;- Sys.time() - start.time
 print(paste(&quot;Time taken: &quot;, time_loo_ss_1, &quot;secs&quot;))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGltZSB0YWtlbjogIDAuNTQ2OTczNDY2ODczMTY5IHNlY3NcIlxuIn0= -->
-<pre><code>[1] &quot;Time taken:  0.546973466873169 secs&quot;</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGltZSB0YWtlbjogIDAuNTU0NjI2NzAzMjYyMzI5IHNlY3NcIlxuIn0= -->
+<pre><code>[1] &quot;Time taken:  0.554626703262329 secs&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vX3NzXzFcbmBgYCJ9 -->
 <pre class="r"><code>loo_ss_1</code></pre>
@@ -1985,7 +2028,7 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnQudGltZSA8LSBTeXMudGltZSgpXG4jIHN1YnNhbXBsaW5nXG5zZXQuc2VlZCg0NzExKVxubG9vX3NzXzIgPC1cbiAgbG9vX3N1YnNhbXBsZShcbiAgICBsbGZ1bl9sb2dpc3RpYyxcbiAgICBvYnNlcnZhdGlvbnMgPSAxMDAsICMgdGFrZSBhIHN1YnNhbXBsZSBvZiBzaXplIDEwMFxuICAgIGNvcmVzID0gMixcbiAgICAjIHRoZXNlIG5leHQgb2JqZWN0cyB3ZXJlIGNvbXB1dGVkIGFib3ZlXG4gICAgbG9vX2FwcHJveGltYXRpb24gPSAndGlzJyxcbiAgICByX2VmZiA9IHJfZWZmLCBcbiAgICBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLFxuICAgIGRhdGEgPSBzdGFuX2RmXzFcbiAgKVxudGltZV9sb29fc3NfMiA8LSBTeXMudGltZSgpIC0gc3RhcnQudGltZVxucHJpbnQocGFzdGUoXCJUaW1lIHRha2VuOiBcIiwgdGltZV9sb29fc3NfMiwgXCJzZWNzXCIpKVxubG9vX3NzXzJcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnQudGltZSA8LSBTeXMudGltZSgpXG4jIHN1YnNhbXBsaW5nXG5zZXQuc2VlZCg0NzExKVxubG9vX3NzXzIgPC1cbiAgbG9vX3N1YnNhbXBsZShcbiAgICBsbGZ1bl9sb2dpc3RpYyxcbiAgICBvYnNlcnZhdGlvbnMgPSAxMDAsICMgdGFrZSBhIHN1YnNhbXBsZSBvZiBzaXplIDEwMFxuICAgIGNvcmVzID0gMixcbiAgICAjIHRoZXNlIG5leHQgb2JqZWN0cyB3ZXJlIGNvbXB1dGVkIGFib3ZlXG4gICAgbG9vX2FwcHJveGltYXRpb24gPSAndGlzJyxcbiAgICByX2VmZiA9IHJfZWZmLCBcbiAgICBkcmF3cyA9IHBhcmFtZXRlcl9kcmF3c18xLFxuICAgIGRhdGEgPSBzdGFuX2RmXzFcbiAgKVxudGltZV9sb29fc3NfMiA8LSBTeXMudGltZSgpIC0gc3RhcnQudGltZVxucHJpbnQocGFzdGUoXCJUaW1lIHRha2VuOiBcIiwgdGltZV9sb29fc3NfMiwgXCJzZWNzXCIpKVxuYGBgIn0= -->
 <pre class="r"><code>start.time &lt;- Sys.time()
 # subsampling
 set.seed(4711)
@@ -2001,14 +2044,38 @@ loo_ss_2 &lt;-
     data = stan_df_1
   )
 time_loo_ss_2 &lt;- Sys.time() - start.time
-print(paste(&quot;Time taken: &quot;, time_loo_ss_2, &quot;secs&quot;))
-loo_ss_2</code></pre>
+print(paste(&quot;Time taken: &quot;, time_loo_ss_2, &quot;secs&quot;))</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGltZSB0YWtlbjogIDYuMDExNjIxNzEzNjM4MzEgc2Vjc1wiXG4ifQ== -->
+<pre><code>[1] &quot;Time taken:  6.01162171363831 secs&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vX3NzXzJcbmBgYCJ9 -->
+<pre class="r"><code>loo_ss_2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMTAwIHN1YnNhbXBsZWQgbG9nLWxpa2VsaWhvb2RcbnZhbHVlcyBmcm9tIDMwMjAgdG90YWwgb2JzZXJ2YXRpb25zLlxuIn0= -->
+<pre><code>
+Computed from 4000 by 100 subsampled log-likelihood
+values from 3020 total observations.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Mywic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAzXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUE0MVNYVStETUJUdCtIQ09SRjNpSCtBUDBJQjFjM3MwY1NhKytwSHN6WFJRWjJOcENTM1JYejh0aFJJZ00wb0NQZmZjOXR4emIzbTgyNkpnR3dBQVhPQTUrdXRyQ1B5WDUvdG9CUXdESnNBRHMzcjkwdWxMc3hPNDgrYUVTVXlqWkwxY3dZVU5RLzBnbUhRaFdxTWJHSS9VL0pSaEtUV1k5MGp2Vmo3VTNHRlV3VXNXY0dseEdIZmFIa3JnVlNQc2ZQOVR5NDIxbHc1ZTk5ay9oWVlkY0p3VDI0RlZQOTFJUlhPc1NCczdUNXNXbmN0cUozRmVNTXIzb1dhSFlyTlNmTUtqZ29RVjJTc1R3bFl0K29HR05QM0ZkNUJoaGVGYnFVV1B1SitLUWxIQmRUbW52bE4vZEhoU2pvaUxpdGYyc2loOXIvaEhoT29DSnQyOForM3FEckg1cGF3eHY1VTZJWHhQT2VsNndEdkM3SkQwR013VVlGRlNybXdubXBWUUNZWHR2aUFWekRLbU4zRDRBVjZpUzY3S0FnQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]},{"label":["subsampling SE"],"name":[3],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-1968.5","2":"15.6","3":"0.0","_rn_":"elpd_loo"},{"1":"3.1","2":"0.1","3":"0.4","_rn_":"p_loo"},{"1":"3937.0","2":"31.2","3":"0.0","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.0.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnQudGltZSA8LSBTeXMudGltZSgpXG5zZXQuc2VlZCg0NzExKVxubG9vXzEgPC0gbG9vKGxsZnVuX2xvZ2lzdGljLFxuICAgIGNvcmVzID0gNCxcbiAgICAjIHRoZXNlIG5leHQgb2JqZWN0cyB3ZXJlIGNvbXB1dGVkIGFib3ZlXG4gICAgcl9lZmYgPSByX2VmZiwgXG4gICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSxcbiAgICBkYXRhID0gc3Rhbl9kZl8xKVxudGltZV9sb29fMSA8LSBTeXMudGltZSgpIC0gc3RhcnQudGltZVxucHJpbnQocGFzdGUoXCJUaW1lIHRha2VuOiBcIiwgdGltZV9sb29fMSwgXCJzZWNzXCIpKVxubG9vXzFcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnQudGltZSA8LSBTeXMudGltZSgpXG5zZXQuc2VlZCg0NzExKVxubG9vXzEgPC0gbG9vKGxsZnVuX2xvZ2lzdGljLFxuICAgIGNvcmVzID0gNCxcbiAgICAjIHRoZXNlIG5leHQgb2JqZWN0cyB3ZXJlIGNvbXB1dGVkIGFib3ZlXG4gICAgcl9lZmYgPSByX2VmZiwgXG4gICAgZHJhd3MgPSBwYXJhbWV0ZXJfZHJhd3NfMSxcbiAgICBkYXRhID0gc3Rhbl9kZl8xKVxudGltZV9sb29fMSA8LSBTeXMudGltZSgpIC0gc3RhcnQudGltZVxucHJpbnQocGFzdGUoXCJUaW1lIHRha2VuOiBcIiwgdGltZV9sb29fMSwgXCJzZWNzXCIpKVxuYGBgIn0= -->
 <pre class="r"><code>start.time &lt;- Sys.time()
 set.seed(4711)
 loo_1 &lt;- loo(llfun_logistic,
@@ -2018,9 +2085,32 @@ loo_1 &lt;- loo(llfun_logistic,
     draws = parameter_draws_1,
     data = stan_df_1)
 time_loo_1 &lt;- Sys.time() - start.time
-print(paste(&quot;Time taken: &quot;, time_loo_1, &quot;secs&quot;))
-loo_1</code></pre>
+print(paste(&quot;Time taken: &quot;, time_loo_1, &quot;secs&quot;))</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGltZSB0YWtlbjogIDEuOTY5NzkxNjUwNzcyMDkgc2Vjc1wiXG4ifQ== -->
+<pre><code>[1] &quot;Time taken:  1.96979165077209 secs&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vXzFcbmBgYCJ9 -->
+<pre class="r"><code>loo_1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMzAyMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 4000 by 3020 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVXZETUJUTjB0WnRCWFhnSDlnZmFGaU5tOXVqNEFSZi9ZQzlTV3lqQnJPa05CbjY2NmMzYlRKcWNZVTA1NTZiZTg2OTkrRjJROU5OaWhDS1VJemhud0JFeWZQVFhiWkVEWU1HS0VaamQzOUQrZ0tBZXpacEs1ckVNTXRYaXlXWmgzQUtIeVgwRU5JVnZTYXpubHBTU0dZTWdFbUhqRy9NdmVQMlBZYzRuNU5Gd05NWnlRT21PYmxzaGZIUGNhMi94b3B0ZVRER25oeXRqUlZiWnJtUDhlTzZWemF1OVJmcGxvYmVSbHhXNVl2VU91aFgzUUNnS0k1MG1KYk1NdkpXZytnL2ZRNTFaWVZXWUlmZDBwTmU4YUR1RWVjNzVkb3JzK0pqcHo2eksyZlFwTnR6NnUrb2czRnJHWVhHRWk5MXd0VzdVUHd3QTN2bDBnZG5zSVptQzZTcWhiSmhFbUFOc2RxeThDNHR0QXhNTXh2YS93S1NkdE1CYXdJQUFBPT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-1968.5","2":"15.6","_rn_":"elpd_loo"},{"1":"3.3","2":"0.1","_rn_":"p_loo"},{"1":"3937.0","2":"31.2","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.0.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Comparing <code>loo_ss_1</code> and <code>loo_1</code>, we can see
@@ -2271,6 +2361,24 @@ loo_obj &lt;- loo.function(
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vX29ialxuYGBgIn0= -->
 <pre class="r"><code>loo_obj</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMDAgYnkgMTAwIGxvZy1saWtlbGlob29kIG1hdHJpeFxuIn0= -->
+<pre><code>
+Computed from 4000 by 100 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Miwic3VtbWFyeSI6eyJEZXNjcmlwdGlvbiI6WyJkZiBbMyDDlyAyXSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlF5MDdETUJCMG5iaTBrWUJLL0VCL0lGWktGUjVISklyRWxZZlVHektKQVF2WGptSlg4UFdsYThkR0lhSUgyN096M3RuWmZiaGRMN04xaGhCS1VJcmhKZ0FSZVg2Nnk2K1FaOUFJcFdqcTNtOUlud0Z3MzJaZGhVK1EvT0tTbGpHWXp3dTZpTUZpV2RKaW9FTXF5WXdCTU91UjZZMjVkOXh1b0oyYzArc0lDNUFLc0tUQkhmNDVMUFMzcTJJYkhydmlRRTVXeG9vTnN6ekUrSEUxS0p1MitvdjJTNk94Q1pkTi9TSzFqdnBOUHdBb3FnTU9zNXBaUnQ5YUVQM0g1NUZ1ck5BSzJtRzNheklvSHJVRDRuU3JuTDA2cno2MjZqTXZYUU9mN3M1eGVKTWV4bDNMSkJvalFXck0xYnRRL0hjRzlzcGxDRTVnRFg0THRHbUZzbkVTWUEyMTJyTDRMNnUwakl5ZkRlMzI0SW1WbDJJQ0FBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-67.5","2":"2.9","_rn_":"elpd_loo"},{"1":"0.1","2":"0.0","_rn_":"p_loo"},{"1":"135.0","2":"5.8","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjAuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.0.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vXzFcbmBgYCJ9 -->
