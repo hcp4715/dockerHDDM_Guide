@@ -291,7 +291,8 @@ fft_next_good_size <- function(N) {
 ```
 
 ```{r}
-loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)
+loo_res <- loo(llfun_logistic, draws = parameter_draws_1, data = stan_df_1, r_eff = r_eff)
+loo_res
 ```
 
 ```{r}
@@ -470,9 +471,9 @@ Note that `idxs` has two columns, the first column is `idx`, the second one is `
 ```{r subsample_idxs}
 # understand order()
 set.seed(123)
-tmp2 <- stats::runif(10)
-order(tmp2)
-tmp2[order(tmp2)]
+# tmp2 <- stats::runif(10)
+# order(tmp2)
+# tmp2[order(tmp2)]
 #
 
 subsample_idxs <- function(estimator, elpd_loo_approximation, observations) {
@@ -495,10 +496,13 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations) {
   idxs_df
 }
 
+set.seed(123)
 idxs <- subsample_idxs(
         estimator = "diff_srs", # here the default is simple random sampling (srs), i.e. randomly sub-sample
         elpd_loo_approximation = elpd_loo_approx,
         observations = observations)
+
+write.csv(idxs, file = "idxs_r.csv", row.names = F)
 ```
 
 #### Step 5: Get the `loo_obj`
