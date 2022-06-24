@@ -4,12 +4,12 @@
 A python package for hierarchical drift-diffusion models.
 
 ### Scope of the current tutorial
-We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.5), which included likelihood-free methods that are not stable and widely used yet. However, the docker image of HDDM 0.9.5 is available.
+We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.7). However, the docker image of HDDM 0.9.5 is available.
 
 ## Motivation behind this guide
 1. HDDM is an influential package for DDM, which is an class of models that used widely in different fields
 2. HDDM' tutorial is outdated 
-3. Principled workflow are recommended in recent year.
+3. Principled workflow are recommended in recent year but not integrated into HDDM analyses.
 
 ## How to use this guide
 

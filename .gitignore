@@ -4,6 +4,6 @@ kabuki/
 *RData
 *Rdata
 *netcdf
-*sync.ffs_db
+*sync*
 .Rproj.user
 temp/.RData

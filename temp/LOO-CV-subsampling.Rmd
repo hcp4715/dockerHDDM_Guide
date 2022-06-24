@@ -453,7 +453,9 @@ compute_lpds <- function(N, data, draws, llfun, cores) {
   unlist(lpds)
 }
 
-elpd_loo_approx <- compute_lpds(N, data, point_est, llfun_logistic, cores=1)
+elpd_loo_approx <- compute_lpds(N, data, point_est, llfun_logistic, cores=1) # using point est
+
+elpd_loo_approx2 <- compute_lpds(N, data, draws, llfun_logistic, cores=4)    # using draws as in put
 
 elpd_loo_approximation <- elpd_loo_approx
 ```
