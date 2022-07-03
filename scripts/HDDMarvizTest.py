@@ -99,7 +99,7 @@ def _HDDMarviz(data=None,model=None,chains=4,draws=2000,warmup=1000,thin=1,nppc=
         xdata_loglik = p_map(partial(pointwise_like_gen, subsample=subsample), ms_tmp)            
         xdata_loglik = pd.concat(xdata_loglik, names=['chain'], 
                                  keys = list(range(len(xdata_loglik))))
-        xdata_loglik = xdata_loglik.reset_index(level=1, drop=True)
+        xdata_loglik = xdata_loglik.reset_index(level=1, drop=True) # remove the index "node"
         xdata_loglik = xr.Dataset.from_dataframe(xdata_loglik)
 
         ### convert to InfData
