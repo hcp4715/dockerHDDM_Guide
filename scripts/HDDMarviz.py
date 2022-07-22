@@ -4,7 +4,6 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
     
     """
     import sys, os, time, csv, glob
-    import feather
     import matplotlib.pyplot as plt
     import seaborn as sns
     import numpy as np
@@ -110,7 +109,7 @@ def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,ch
         
     return ms_tmp, InfData_tmp 
 
-def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, thin=1, chains=4, savefile=True, savetag=None):
+def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, thin=1, chains=4, savetag=None):
     """
     Run a model or a list of models in parallel and return an ArviZ InfData or a list of InfData
     
