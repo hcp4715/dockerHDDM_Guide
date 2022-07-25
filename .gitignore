@@ -1,6 +1,7 @@
 hddm/
 kabuki/
 *chain*
+*/*._*
 *RData
 *Rdata
 *netcdf
