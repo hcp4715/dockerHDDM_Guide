@@ -4,3 +4,4 @@
 !/scripts/plot_ppc_by_cond.py
 !/scripts/pointwise_loglik_gen.py
 !/scripts/post_pred_gen_redefined.py
+!/scripts/InferenceDataFromHDDM.py

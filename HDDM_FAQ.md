@@ -24,20 +24,19 @@ As:
 
 ## Q2: Between-subject effects
 ### Description of the question: 
-How to model the effect of individual differences in HDDM.
+How to model the effect of individual differences or between-subject effect in HDDM.
 
 #### Variation 1: 
-Modelling the effect of a continuous between-subject factor (e.g., scale scores)
+Modelling the effect of a continuous between-subject factor (e.g., scale scores).
 #### Variation 2:
-Modelling group effect (e.g.,  three groups of participants)
+Modelling group effect (e.g.,  three groups of participants).
 
 ### Posts and scripts
-One discussion started from Jan 2017 and last updated at Dec 2020: https://groups.google.com/g/hddm-users/c/C96uz2_xFl8
-Another discussion about between and within-subject effect at May 2017 and last updated at Aug 2020: https://groups.google.com/g/hddm-users/c/eJ3vsuR4rRE/m/ZEUZQP4kBAAJ
+Several posts had discussed this issue. 
+Jan 2017 to Dec 2020: https://groups.google.com/g/hddm-users/c/C96uz2_xFl8
+May 2017 to Aug 2020: https://groups.google.com/g/hddm-users/c/eJ3vsuR4rRE/m/ZEUZQP4kBAAJ, which focused on between and within-subject effect.
 
-Similar question re-appeared at April 2020
-https://groups.google.com/g/hddm-users/c/JWDYbE85XTU/m/RkPBgTLSEQAJ
-, May 2020 https://groups.google.com/g/hddm-users/c/F65i6vWjsAM/m/-HOsL7SLBwAJ.
+Similar question re-appeared at April 2020 https://groups.google.com/g/hddm-users/c/JWDYbE85XTU/m/RkPBgTLSEQAJ, May 2020 https://groups.google.com/g/hddm-users/c/F65i6vWjsAM/m/-HOsL7SLBwAJ.
 
 Answer from Michael J Frank, with example code: https://groups.google.com/group/hddm-users/attach/7d8208ab9c71a/hddm_bwsubs_simulation.py?part=0.1
 
@@ -47,8 +46,9 @@ Also example from Mads Lund Pedersen: https://groups.google.com/group/hddm-users
 
 ### Solutions
 
-General solution: using simulation to make sure that you can recover the parameter.
+General solution: The core of this issue is how to model between-subject effect of individuals differences using hierarchical model within the context of DDM. Thus, the first thing need to know is that this issue can only be addressed by `HDDMregressor(.)`. Then comes the question how to write the code. In those discussions, Michael and Mads offered their example code. The final answer is to simulating and make sure that you can recovery the parameter.
 
+The long answer from Michael: https://groups.google.com/g/hddm-users/c/C96uz2_xFl8/m/GWhXFZtHAwAJ
 
 We've been interested to add capability for estimating regression coefficients for between subject effects, e.g. to see if we can estimate within HDDM the impact of a continuous measure x, where x can be age, IQ, etc on DDM params.  The upshot is that the answer is yes, at least in theory:  I ran some simulations and could accurately recover the coefficients. including when there are additional within-subject condition effects, which are also accurately recovered in the same model.  (I reiterate a point from a previous post though, based on this article, that it is actually fine to fit the model without x as a regressor at all, and then to correlate the individual subject intercepts with the between subjects factor after the fact  -- but that involves a classical correlation test whereas the regression approach here estimates the effect and its uncertainty within the bayesian parameter estimation itself). 
 
