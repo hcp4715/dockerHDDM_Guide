@@ -140,3 +140,6 @@ scatter(pp,p)
 stats.pearsonr(pp,p) # should be zero correlation if entirely accounted for by x regressor - this correlation should instead be positive if x is removed from the model fit
 
 ```
+
+## Q3: Stimulus-coding, Response-coding, vs. Accuracy-Coding
+### 

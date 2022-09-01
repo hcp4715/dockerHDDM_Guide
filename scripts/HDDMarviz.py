@@ -1,4 +1,4 @@
-def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,chains=4,savefile=True,savetag=None):
+def _HDDMarviz(data=None,model=None,samples=2000,nppc = 1000,burn=1000,thin=1,chains=4,savetag=None):
     """
     Run one HDDM and convert to InferenceData
     
@@ -120,9 +120,9 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
     burn: int, n of sample that will burn in
     thin:
     chains: int, how many chains
-    savefile: bool, "True", save the temporary data; "False", do not save. Here we make it always true.
     
-    This function will fit the data with all models in the model_func
+    This function will fit the data with all models in the model_func.
+    It will automatically find whether the model data has been save, if yes, then it will reload the file instead of re-running.
     
     """
     
@@ -136,8 +136,7 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
                                      nppc=nppc, 
                                      burn=burn, 
                                      thin=thin, 
-                                     chains=chains, 
-                                     savefile=savefile,
+                                     chains=chains,
                                      savetag=savetag)
     
     # if model_func is a list of functions
@@ -154,8 +153,7 @@ def HDDMarviz(data=None, model_func=None, samples=2000, nppc = 1000, burn=1000, 
                                                        nppc=nppc, 
                                                        burn=burn, 
                                                        thin=thin, 
-                                                       chains=chains, 
-                                                       savefile=savefile,
+                                                       chains=chains,
                                                        savetag=savetag)
     else:
         raise ValueError('The model function should be a function or a list of function')

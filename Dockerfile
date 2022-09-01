@@ -70,25 +70,15 @@ RUN conda install --quiet --yes \
   
 USER $NB_UID
 RUN pip install --upgrade pip && \
-    # pip install --no-cache-dir 'kabuki==0.6.4' && \
     pip install --no-cache-dir 'hddm==0.8.0' && \
-    # pip install --no-cache-dir 'feather-format' && \
-    # install plotly and its chart studio extension
-    # pip install --no-cache-dir 'chart_studio==1.1.0' && \
     pip install --no-cache-dir 'plotly==4.14.3' && \
     pip install --no-cache-dir 'cufflinks==0.17.3' && \
     # install ptitprince for raincloud plot in python
     pip install --no-cache-dir 'ptitprince==0.2.*' && \
-    # pip install --no-cache-dir 'kabuki==0.6.3' && \
     pip install --no-cache-dir 'multiprocess==0.70.12.2' && \
     pip install --no-cache-dir 'pathos==0.2.8' && \
     pip install --no-cache-dir 'p_tqdm' && \
-    # pip install --no-cache-dir 'paranoid-scientist' && \
-    # pip install --no-cache-dir 'pyddm' && \
-    # pip install --no-cache-dir 'pymc3==3.11.*' && \
-    # pip install --no-cache-dir 'bambi==0.6.*' && \
     pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki.git@57338156ffbd449e54227b3123f6b9d0b40179ca && \
-    # pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki.git@0616114cb95d8c7d136fa5bd8f67c9907838e5dd && \
     # pip install --no-cache-dir git+https://github.com/hddm-devs/hddm.git@3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9 && \
     fix-permissions "/home/${NB_USER}"
 
@@ -124,10 +114,12 @@ WORKDIR $HOME
 
 # Copy example data and scripts to the example folder
 RUN mkdir /home/$NB_USER/scripts && \
+    mkdir /home/$NB_USER/example && \
     rm -r /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER
 
-COPY /temp/Tutorial_DDM_docker.ipynb /home/${NB_USER}/scripts
+COPY /temp/HDDM_official_tutorial_reproduced.ipynb /home/${NB_USER}/example
+COPY /temp/RLHDDMtutorial_reproduced.ipynb /home/${NB_USER}/example
 COPY /scripts/HDDMarviz.py /home/${NB_USER}/scripts
 COPY /scripts/plot_ppc_by_cond.py /home/${NB_USER}/scripts
 COPY /scripts/pointwise_loglik_gen.py /home/${NB_USER}/scripts

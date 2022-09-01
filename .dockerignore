@@ -1,5 +1,6 @@
 **
-!/temp/Tutorial_DDM_docker.ipynb
+!/temp/RLHDDMtutorial_reproduced.ipynb
+!/temp/HDDM_official_tutorial_reproduced.ipynb
 !/scripts/HDDMarviz.py
 !/scripts/plot_ppc_by_cond.py
 !/scripts/pointwise_loglik_gen.py

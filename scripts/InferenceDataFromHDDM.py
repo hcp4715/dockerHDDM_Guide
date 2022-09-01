@@ -1,8 +1,8 @@
-def InferenceDataFromHDDM(models=None, nppc = 1000, save_name=None):
+def InferenceDataFromHDDM(modelres=None, nppc = 1000, save_name=None):
     """
     Convert HDDM object with multiple chain to InferenceData
     
-    models:   a list of HDDM model, each element represents one chain
+    modelres:   a list of HDDM model, each element represents one chain
     nppc:     integer, number of posterior predictives
     savename: string, name used for save the InferenceData
     
@@ -30,7 +30,8 @@ def InferenceDataFromHDDM(models=None, nppc = 1000, save_name=None):
     from pointwise_loglik_gen import pointwise_like_gen
     
 
-    ms_tmp = models
+    ms_tmp = modelres
+    
     
     # Check whether InferenceData with the same name already exist, if yes, we won't rerun the whole process
     InfDataName = save_name + "_netcdf"
