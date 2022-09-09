@@ -7,4 +7,8 @@ kabuki/
 *netcdf
 *ffs_db
 .Rproj.user
-temp/.RData
+*/.RData
+.vscode
+.local
+.cache
+.ipynb_checkpoints
