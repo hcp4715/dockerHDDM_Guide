@@ -1,14 +1,30 @@
-hddm/
-kabuki/
-*chain*
+## MacOS file
 */*._*
-*RData
-*Rdata
-*netcdf
+
+## free file sync
 *ffs_db
-.Rproj.user
-*/.RData
+
+## VS code related
 .vscode
 .local
 .cache
+
+## ipy related
 .ipynb_checkpoints
+__pycache__
+*/.ipynb_checkpoints
+*/__pycache__
+
+## Related:
+.RData
+.Rhistory
+.Rproj.user
+*/.RData
+*/.Rhistory
+*/.Rproj.user
+
+## big file
+*netcdf
+*/*netcdf
+*chain*
+*/*chain*
