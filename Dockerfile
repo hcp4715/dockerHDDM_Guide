@@ -22,7 +22,7 @@ USER $NB_UID
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
-    'arviz=0.11.4' \
+    'arviz=0.12.0' \
     'beautifulsoup4=4.9.*' \
     'conda-forge::blas=*=openblas' \
     'bokeh=2.4.*' \
