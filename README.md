@@ -13,7 +13,7 @@ We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of
 
 ## How to use this guide
 
-First, this guide included both theoretical and practical parts. 
+First, this guide included a primer paper and code (in `jupyter notebook`). 
 
 Second, all scripts and code were packaged into a docker image. You need to pull the docker image from docker hub. To do so, first install docker and test it. There are many tutorial on this, here is one on [docker's website](https://docs.docker.com/engine/install/ubuntu/) for linux. Then, pull the docker image from docker hub:
 
