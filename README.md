@@ -89,7 +89,7 @@ Code for building the docker image (don't forget the `.` in the end):
 ```
 docker build -t hcp4715/hddm:0.8_tutorial -f Dockerfile .
 ```
-You can replace `hcp4715` with your username in docker hub, and replace `ddm:0.8_tutorial` with a name and tag you prefer.
+You can replace `hcp4715` with your username in docker hub, and replace `hddm:0.8_tutorial` with a name and tag you prefer.
 
 ## Acknowledgement
 Thank [@madslupe](https://github.com/madslupe) for his previous HDDM image, which laid the base for the current version. Thank [Dr Rui Yuan](https://scholar.google.com/citations?user=h8_wSLkAAAAJ&hl=en) for his help in creating the Dockerfile.
