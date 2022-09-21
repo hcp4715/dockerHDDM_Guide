@@ -66,8 +66,14 @@ RUN conda install --quiet --yes \
 
 # conda install --channel=numba llvmlite
 # pip install sparse
+
 # conda install -c conda-forge python-graphviz
-  
+RUN conda install -c conda-forge --quiet --yes \
+    'python-graphviz' \
+    && \
+    conda clean --all -f -y && \
+    fix-permissions "/home/${NB_USER}"
+
 USER $NB_UID
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir 'hddm==0.8.0' && \
@@ -78,6 +84,12 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir 'multiprocess==0.70.12.2' && \
     pip install --no-cache-dir 'pathos==0.2.8' && \
     pip install --no-cache-dir 'p_tqdm' && \
+    # install paranoid-scientist for pyddm
+    pip install --no-cache-dir 'paranoid-scientist' && \
+    pip install --no-cache-dir 'pyddm' && \
+    # install bambi
+    pip install --no-cache-dir 'pymc3==3.11.*' && \
+    pip install --no-cache-dir 'bambi==0.8.*' && \
     pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki.git@57338156ffbd449e54227b3123f6b9d0b40179ca && \
     # pip install --no-cache-dir git+https://github.com/hddm-devs/hddm.git@3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9 && \
     fix-permissions "/home/${NB_USER}"
