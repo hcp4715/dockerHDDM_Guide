@@ -1,4 +1,32 @@
-# Reproducible Bayesian hierarchical drift-diffusion modelling with docker
+# About this Repo
+
+This is a repo for preparing *Reproducible Bayesian hierarchical drift-diffusion modelling with docker* 
+
+## Folder structure
+
+```
+dockerDDM_Guide
+|   Dockerfile
+|   README.md
+|
+└───scripts
+|   |    HDDMarvz.py
+|   |    InferenceDataFromHDDM.py
+|   |    plot_ppc_by_cond.py
+|   |    pointwise_loglik_gen.py
+|   |    post_pred_gen_redefined.py
+|   |    ...
+|
+└───temp
+|   |    include all kinds of temporary notebooks and scripts
+|   |    ...
+|
+└───tutorial
+    |       dockerDDM_tutorial.ipynb
+    |       Def_Models.py
+    |       Run_all_models.py
+    |       figs
+```
 
 ## What is HDDM? 
 A python package for hierarchical drift-diffusion models.
@@ -6,14 +34,9 @@ A python package for hierarchical drift-diffusion models.
 ### Scope of the current tutorial
 We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.*). However, the docker images of more recent HDDM are available (https://hub.docker.com/r/hcp4715/hddm).
 
-## Motivation behind this guide
-1. HDDM is an influential package for DDM, which is an class of models that used widely in different fields
-2. HDDM' tutorial is outdated 
-3. Principled workflow are recommended in recent year but not integrated into HDDM analyses.
-
 ## How to use this guide
 
-First, this guide included a primer paper and code (in `jupyter notebook`). 
+First, this guide included a primer paper and code (in `jupyter notebook`, i.e., `./tutorial/dockerDDM_tutorial.ipynb`). 
 
 Second, all scripts and code were packaged into a docker image. You need to pull the docker image from docker hub. To do so, first install docker and test it. There are many tutorial on this, here is one on [docker's website](https://docs.docker.com/engine/install/ubuntu/) for linux. Then, pull the docker image from docker hub:
 
@@ -67,17 +90,6 @@ Copy the url (http://127.0.0.1:8888/?.......) to a browser (firefox or chrome) a
 Under the `Files` tab, there should be three folders: `work`, `example`, and `scripts`. The `work` folder is the local folder mounted in docker container. The `example` folder was the one built in docker image, this folder includes example jupyter notebooks. The `scripts` folder contains python scripts that are supporting function unavailable in original HDDM.
 
 Enter `work` folder, you can start your analysis within jupyter notebook.
-
-## Using the tutorial scipts
-You can also run the tutorial notebook in the `example` folder without mounting local folder to the docker container. 
-
-```
-docker run -it --rm --cpus=5 \
--p 8888:8888 hcp4715/hddm:0.8_tutorial jupyter notebook
-```
-
-## Potential errors
-* Permission denied. Please see this [post](https://groups.google.com/forum/#!topic/hddm-users/Qh-aOC0N6cU) about the permission problem.
 
 ## How this docker image was built
 An alternative way to get the docker image is to build it from `Dockerfile`.
