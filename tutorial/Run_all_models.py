@@ -1,10 +1,19 @@
-import random
-import hddm
-import argparse, sys, os, csv
+### Note about this script 
+# 
+# Purpose: run all models defined in `Def_Models.py` in terminal
+#
 
-scripts_dir = '/home/jovyan/scripts'
+import random, sys, os, csv   # import random and other related library
+import hddm                   # import hdddm
+import argparse               # import argpase for defining arguments
+
+# Add the folder that contains script in path
+# This path is useful inside the docker image, 
+# Please change the path to your local folder path if you use this outside docker
+scripts_dir = '/home/jovyan/scripts'  
 sys.path.append(scripts_dir)
 
+# define the function that can be run in terminal
 def main():
     '''
     This python function is a wrapper used to run our models, which were defined in "Def_Models". Examples of how to call it:
@@ -21,33 +30,34 @@ def main():
     # import the self-defined function
     from HDDMarviz import HDDMarviz
     # import the models
-    from Def_Models import ms0, ms1, ms2, ms3, ms4, ms5
+    from Def_Models import ms0, ms1, ms2, ms3, ms4
+
     # put all models in a list
-    model_func = [ms0, ms1, ms2, ms3, ms4, ms5]
+    model_func = [ms0, ms1, ms2, ms3, ms4]
+
     # create a list of model key for later retrieval.
     m_keys = ["ms0",
               "ms1",
               "ms2",
               "ms3",
-              "ms4",
-              "ms5"]
+              "ms4"]
     
     # Define the input arguments of the current script, we can add more if we have different needs.
     parser = argparse.ArgumentParser()   
-    parser.add_argument('--samples', '-sp', type=int, default=2000)
-    parser.add_argument('--burn', '-bn', type=int, default=1000)
-    parser.add_argument('--thin', '-tn', type=int, default=1)
-    parser.add_argument('--nppc', '-np', type=int, default=1000)
-    parser.add_argument('--chains', '-ch', type=int, default=4)
-    parser.add_argument('--test', '-t', type=int, default=0)
-    parser.add_argument('--model', '-m', type=str, default=None)
-    parser.add_argument('--savetag', '-tag', type=str, default=None)
+    parser.add_argument('--samples', '-sp', type=int, default=2000)  # number of samples
+    parser.add_argument('--burn', '-bn', type=int, default=1000)     # number of burnin (warmup)
+    parser.add_argument('--thin', '-tn', type=int, default=1)        # number of thin
+    parser.add_argument('--nppc', '-np', type=int, default=1000)     # number of posterior predicitve samples
+    parser.add_argument('--chains', '-ch', type=int, default=4)      # number of chains of mcmc
+    parser.add_argument('--test', '-t', type=int, default=0)         # use test to define to mode: testing or real data fitting 
+    parser.add_argument('--model', '-m', type=str, default=None)     # input model defining functions 
+    parser.add_argument('--savetag', '-tag', type=str, default=None) # tag for saving model files
     args = parser.parse_args()
     
+    # load the data will be used as input
     data = hddm.load_csv(hddm.__path__[0] + '/examples/cavanagh_theta_nn.csv')
     
-    # Run a simple and quick model to test the script.
-    if args.test == 1:
+    if args.test == 1: # use test to define to mode: testing or real data fitting Run a simple and quick model to test the script.
         print("This is a testing run")
         runtime = "0"
         samples = args.samples
@@ -92,7 +102,6 @@ def main():
                                 burn=burn, 
                                 thin=thin, 
                                 chains=chains, 
-                                # savefile=True,
                                 savetag=savetag)
     
 if __name__=='__main__':
