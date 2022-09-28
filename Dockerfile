@@ -3,7 +3,7 @@
 
 # This Dockerfile is for DDM tutorial
 # The buid from the base of minimal-notebook, based on python 3.8.8
-# 
+ 
 ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8.8
 FROM $BASE_CONTAINER
 
@@ -11,11 +11,9 @@ LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
 
 USER root
 
-# ffmpeg for matplotlib anim & dvipng for latex labels
 RUN apt-get update && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt-get install -y --no-install-recommends ffmpeg dvipng && \
-    # apt-get install -y --no-install-recommends python3.8-gdbm && \
     rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
@@ -64,9 +62,6 @@ RUN conda install --quiet --yes \
     conda clean --all -f -y && \
     fix-permissions "/home/${NB_USER}"
 
-# conda install --channel=numba llvmlite
-# pip install sparse
-
 # conda install -c conda-forge python-graphviz
 RUN conda install -c conda-forge --quiet --yes \
     'python-graphviz' \
@@ -99,27 +94,6 @@ ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" &&\
      fix-permissions "/home/${NB_USER}"
-
-# USER $NB_UID
-# WORKDIR $HOME
-
-# # Change the configuration of ipyparallel
-# RUN sed -i  "/# Configuration file for jupyter-notebook./a c.NotebookApp.server_extensions.append('ipyparallel.nbextension')"  /home/jovyan/.jupyter/jupyter_notebook_config.py
-
-# USER $NB_UID
-# RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-#     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
-#     jupyter labextension install jupyter-matplotlib --no-build && \
-#     jupyter lab build && \
-#         jupyter lab clean && \
-#         jlpm cache clean && \
-#         npm cache clean --force && \
-#         rm -rf "/home/${NB_USER}/.cache/yarn" && \
-#         rm -rf "/home/${NB_USER}/.node-gyp" && \
-#     fix-permissions "/home/${NB_USER}"
-
-# # USER root
-# RUN jupyter notebook --generate-config -y
 
 USER $NB_UID
 WORKDIR $HOME
