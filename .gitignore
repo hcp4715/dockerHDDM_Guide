@@ -1,5 +1,6 @@
 ## MacOS file
-*/*._*
+*/._*
+*/*/._*
 
 ## free file sync
 *ffs_db
@@ -28,3 +29,6 @@ __pycache__
 */*netcdf
 *chain*
 */*chain*
+
+## unpublished manuscript
+/manuscript
