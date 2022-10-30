@@ -5,7 +5,7 @@ This is a repo for preparing *Reproducible Bayesian hierarchical drift-diffusion
 ## Folder structure
 
 ```
-dockerDDM_Guide
+dockerHDDM_Guide
 |   Dockerfile
 |   README.md
 |
@@ -22,7 +22,7 @@ dockerDDM_Guide
 |   |    ...
 |
 └───tutorial
-    |       dockerDDM_tutorial.ipynb
+    |       dockerHDDM_tutorial.ipynb
     |       Def_Models.py
     |       Run_all_models.py
     |       figs
