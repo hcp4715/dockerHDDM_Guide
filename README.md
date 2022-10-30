@@ -22,10 +22,10 @@ dockerHDDM_Guide
 |   |    ...
 |
 └───tutorial
-    |       dockerHDDM_tutorial.ipynb
-    |       Def_Models.py
-    |       Run_all_models.py
-    |       figs
+    |    dockerHDDM_tutorial.ipynb
+    |    Def_Models.py
+    |    Run_all_models.py
+    |    figs
 ```
 
 ## What is HDDM? 
