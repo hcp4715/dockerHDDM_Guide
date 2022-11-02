@@ -111,4 +111,7 @@ COPY /scripts/plot_ppc_by_cond.py /home/${NB_USER}/scripts
 COPY /scripts/pointwise_loglik_gen.py /home/${NB_USER}/scripts
 COPY /scripts/post_pred_gen_redefined.py /home/${NB_USER}/scripts
 COPY /scripts/InferenceDataFromHDDM.py /home/${NB_USER}/scripts
+COPY /tutorial/dockerHDDM_tutorial.ipynb /home/${NB_USER}/example
+COPY /tutorial/Run_all_models.py /home/${NB_USER}/example
+COPY /tutorial/Def_Models.py /home/${NB_USER}/example
 

@@ -1,8 +1,12 @@
 # About this Repo
 
-This is a repo for preparing *Reproducible Bayesian hierarchical drift-diffusion modelling with docker* 
+This is a repo for preparing *A Hitchhiker’s Guide to Bayesian Hierarchical Drift-Diffusion Modeling with dockerHDDM* 
 
-## Folder structure
+Please read our preprint at: https://psyarxiv.com/6uzga/
+
+The docker image described by this tutorial can be found at: https://hub.docker.com/r/hcp4715/hddm, with tag `0.8_tutorial`.
+
+## Folder structure of the current repo
 
 ```
 dockerHDDM_Guide
@@ -36,7 +40,7 @@ We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of
 
 ## How to use this guide
 
-First, this guide included a primer paper and code (in `jupyter notebook`, i.e., `./tutorial/dockerDDM_tutorial.ipynb`). 
+First, this guide included a primer paper (see our preprint: https://psyarxiv.com/6uzga/) and code (in `jupyter notebook`, i.e., `./tutorial/dockerHDDM_tutorial.ipynb` in this repo).
 
 Second, all scripts and code were packaged into a docker image. You need to pull the docker image from docker hub. To do so, first install docker and test it. There are many tutorial on this, here is one on [docker's website](https://docs.docker.com/engine/install/ubuntu/) for linux. Then, pull the docker image from docker hub:
 
@@ -50,7 +54,7 @@ After pulling it from docker hub, you can then run jupyter notebook in the conta
 
 ```
 docker run -it --rm --cpus=5 \
--v /home/hcp4715/DDM_guide:/home/jovyan/work \
+-v /home/hcp4715/DDM/dockerHDDM_guide:/home/jovyan/work \
 -p 8888:8888 hcp4715/hddm:0.8_tutorial jupyter notebook
 ```
 
@@ -64,9 +68,9 @@ docker run -it --rm --cpus=5 \
 
 `-v` ---- mount a folder to the container
 
-`/home/hcp4715/DDM_guide` ---- the directory of a local folder where I stored my data. 
+`/home/hcp4715/DDM/dockerHDDM_guide` ---- the directory of a local folder where I store my script and data. 
 
-`/home/jovyan/work` ---- the folder path  where the local folder will be mounted. 
+`/home/jovyan/work` ---- the folder path  where the local folder will be mounted [**do not change this unless you know what you are doing**]
 
 `-p` ---- Publish a container’s port(s) to the host
 
@@ -87,9 +91,9 @@ Or copy and paste one of these URLs:
 
 Copy the url (http://127.0.0.1:8888/?.......) to a browser (firefox or chrome) and it will show a web page, this is the interface of jupyter notebook! 
 
-Under the `Files` tab, there should be three folders: `work`, `example`, and `scripts`. The `work` folder is the local folder mounted in docker container. The `example` folder was the one built in docker image, this folder includes example jupyter notebooks. The `scripts` folder contains python scripts that are supporting function unavailable in original HDDM.
+Under the `Files` tab, there should be three folders: `work`, `example`, and `scripts`. The `work` folder is the local folder mounted in docker container. The `example` folder was the one built in docker image, this folder contains several example jupyter notebooks, including `dockerHDDM_tutorial.ipynb`. The `scripts` folder contains python scripts that are supporting function unavailable in original HDDM.
 
-Enter `work` folder, you can start your analysis within jupyter notebook.
+Enter `work` folder, you can start your analyses within jupyter notebook.
 
 ## How this docker image was built
 An alternative way to get the docker image is to build it from `Dockerfile`.
