@@ -38,19 +38,59 @@ A python package for hierarchical drift-diffusion models.
 ### Scope of the current tutorial
 We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.*). However, the docker images of more recent HDDM are available (https://hub.docker.com/r/hcp4715/hddm).
 
-## How to use this guide
+## Three simple steps for using this guide
 
-First, this guide included a primer paper (see our preprint: https://psyarxiv.com/6uzga/) and code (in `jupyter notebook`, i.e., `./tutorial/dockerHDDM_tutorial.ipynb` in this repo).
+### Step 1: Install docker on your machine
 
-Second, all scripts and code were packaged into a docker image. You need to pull the docker image from docker hub. To do so, first install docker and test it. There are many tutorial on this, here is one on [docker's website](https://docs.docker.com/engine/install/ubuntu/) for linux. Then, pull the docker image from docker hub:
+For Mac users, see [this](https://docs.docker.com/desktop/install/mac-install/) for installation and [this](https://docs.docker.com/desktop/mac/permission-requirements/) for permission requirements. 
+
+For windows users, see [this](https://docs.docker.com/desktop/install/windows-install/) for installation and [this](https://docs.docker.com/desktop/windows/permission-requirements/) for permission requirements.
+
+For Linux users, you may only need the docker engine instead of docker desktop, see the differences [here](https://docs.docker.com/desktop/faqs/linuxfaqs/#what-is-the-difference-between-docker-desktop-for-linux-and-docker-engine). Please see [here](https://docs.docker.com/engine/install/) for installing docker engine in different distributions of Linux.
+
+** Plese verify docker desktop or docker engine is properly installed ** 
+
+For Mac & Windows users, start docker desktop and then run `hello-world` images by the following code in your terminal or command line:
+
+`docker run hello-world`
+
+This command downloads a test image and runs it in a container. When the container runs, it prints a confirmation message and exits.
+
+For linux users, verification of the installation is part of the instructions, which include code (for Ubuntu) like this:
+
+`sudo docker run hello-world`
+
+### Step 2: Pull the `hddm:08_tutorial`
+
+Now that we successfully installed docker and can run docker in terminal or command line, we then pull the docker image for the current tutorial using the code below:
 
 ```
 docker pull hcp4715/hddm:0.8_tutorial
 ```
 
-**Note**: you may need `sudo` permission to run `docker`.
+Note that this is also part of our tutorial (see our preprint: https://psyarxiv.com/6uzga/) and code (in `jupyter notebook`, i.e., `./tutorial/dockerHDDM_tutorial.ipynb` in this repo).
 
-After pulling it from docker hub, you can then run jupyter notebook in the container (e.g., in bash of linux):
+### Step 3: Using HDDM and the tutorial
+
+Now that we successfully pulled the docker image for the tutorial, we can use use the HDDM inside the docker by starting a container.
+
+#### For Mac users
+
+##### With Apple chips
+
+...
+
+##### With Intel chips
+
+...
+
+#### For Windows users
+
+...
+
+#### For Linux users
+
+run the code below in termial:
 
 ```
 docker run -it --rm --cpus=5 \
@@ -64,7 +104,7 @@ docker run -it --rm --cpus=5 \
 
 `--rm` ---- Automatically remove the container when it exits
 
-`--cpus=5` ---- Number of cores will be used by docker
+`--cpus=5` ---- Number of cores will be used by docker, make sure you have more cores than the number here
 
 `-v` ---- mount a folder to the container
 
@@ -93,7 +133,9 @@ Copy the url (http://127.0.0.1:8888/?.......) to a browser (firefox or chrome) a
 
 Under the `Files` tab, there should be three folders: `work`, `example`, and `scripts`. The `work` folder is the local folder mounted in docker container. The `example` folder was the one built in docker image, this folder contains several example jupyter notebooks, including `dockerHDDM_tutorial.ipynb`. The `scripts` folder contains python scripts that are supporting function unavailable in original HDDM.
 
-Enter `work` folder, you can start your analyses within jupyter notebook.
+Enter `example` folder, you can reproduce the analysis we presented in the tutorial.
+
+Enter `work` folder, you can analyze your own data stored in folder `/home/hcp4715/DDM/dockerHDDM_guide` with HDDM (version 0.8).
 
 ## How this docker image was built
 An alternative way to get the docker image is to build it from `Dockerfile`.
