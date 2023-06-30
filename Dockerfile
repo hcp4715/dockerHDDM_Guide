@@ -12,6 +12,7 @@ LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
 USER root
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt-get install -y --no-install-recommends ffmpeg dvipng && \
     rm -rf /var/lib/apt/lists/*
