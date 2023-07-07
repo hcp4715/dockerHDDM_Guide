@@ -2,9 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 # This Dockerfile is for DDM tutorial
-# The buid from the base of minimal-notebook, based on python 3.8.8
+# The buid from the base of minimal-notebook, based on python 3.8
  
-ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8.8
+ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
