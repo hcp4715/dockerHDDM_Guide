@@ -4,7 +4,7 @@
 # This Dockerfile is for DDM tutorial
 # The buid from the base of minimal-notebook, based on python 3.8.8
  
-ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8.8
+ARG BASE_CONTAINER=jupyter/scipy-notebook:aarch64-python-3.8
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
@@ -12,52 +12,33 @@ LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
 USER root
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends apt-utils && \
+    apt-get install -y apt-utils && \
+    apt-get install -y --no-install-recommends build-essential && \
+    apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu && \
+    apt-get install -y --no-install-recommends g++-aarch64-linux-gnu && \
+    apt-get install -y libatlas-base-dev && \
+    apt-get install -y gfortran && \
+    apt-get install -y libopenblas-dev && \
+    apt-get install -y liblapack-dev && \
     apt-get install -y --no-install-recommends ffmpeg dvipng && \
     rm -rf /var/lib/apt/lists/*
+
+# set the env variables
+RUN export CC=aarch64-linux-gnu-gcc &&\
+    export CXX=aarch64-linux-gnu-g++ &&\
+    export LD=aarch64-linux-gnu-ld &&\
+    export AR=aarch64-linux-gnu-ar &&\
+    export CROSS_COMPILE=aarch64-linux-gnu-
 
 USER $NB_UID
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
     'arviz=0.12.0' \
-    'beautifulsoup4=4.9.*' \
-    'conda-forge::blas=*=openblas' \
-    'bokeh=2.4.*' \
-    'bottleneck=1.3.*' \
-    'cloudpickle=1.4.*' \
-    'cython=0.29.*' \
-    'dask=2.15.*' \
-    # dill must be 0.3.4
-    'dill=0.3.4' \
     'git' \
-    'h5py=2.10.*' \
-    'hdf5=1.10.*' \
-    'ipywidgets=7.6.*' \
-    'ipympl=0.8.*'\
     'jupyter_bokeh' \
-    'jupyterlab_widgets' \
-    'matplotlib-base=3.3.*' \
-    'mkl-service' \
-    'numba=0.54.*' \
-    'numexpr=2.7.*' \
-    'pandas=1.3.5' \
-    'patsy=0.5.*' \
-    'protobuf=3.11.*' \
-    'pytables=3.6.*' \
-    'scikit-image=0.16.*' \
-    'scikit-learn=0.22.*' \
-    'scipy=1.7.3' \
-    'seaborn=0.11.*' \
-    'sqlalchemy=1.3.*' \
-    'statsmodels=0.11.*' \
-    'sympy=1.5.*' \
-    'vincent=0.4.*' \
-    'widgetsnbextension=3.5.*'\
-    'xlrd=1.2.*' \
-    'xarray=0.19.0' \
-    # 'ipyparallel=6.3.0' \
-    'pymc=2.3.8' \
     && \
     conda clean --all -f -y && \
     fix-permissions "/home/${NB_USER}"
@@ -69,15 +50,16 @@ RUN conda install -c conda-forge --quiet --yes \
     conda clean --all -f -y && \
     fix-permissions "/home/${NB_USER}"
 
+# uinstall pymc 5 to avoid conflict:
+RUN pip uninstall --no-cache-dir pymc -y && \
+    fix-permissions "/home/${NB_USER}"
+
 USER $NB_UID
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir 'hddm==0.8.0' && \
     pip install --no-cache-dir 'plotly==4.14.3' && \
     pip install --no-cache-dir 'cufflinks==0.17.3' && \
     # install ptitprince for raincloud plot in python
     pip install --no-cache-dir 'ptitprince==0.2.*' && \
-    pip install --no-cache-dir 'multiprocess==0.70.12.2' && \
-    pip install --no-cache-dir 'pathos==0.2.8' && \
     pip install --no-cache-dir 'p_tqdm' && \
     # install paranoid-scientist for pyddm
     pip install --no-cache-dir 'paranoid-scientist' && \
@@ -85,8 +67,9 @@ RUN pip install --upgrade pip && \
     # install bambi
     pip install --no-cache-dir 'pymc3==3.11.*' && \
     pip install --no-cache-dir 'bambi==0.8.*' && \
-    pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki.git@57338156ffbd449e54227b3123f6b9d0b40179ca && \
-    # pip install --no-cache-dir git+https://github.com/hddm-devs/hddm.git@3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9 && \
+    pip install --no-cache-dir git+https://github.com/hcp4715/pymc2 &&\
+    pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki && \    
+    pip install --no-cache-dir git+https://github.com/hddm-devs/hddm@3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9 && \
     fix-permissions "/home/${NB_USER}"
 
 # Import matplotlib the first time to build the font cache.
@@ -114,4 +97,3 @@ COPY /scripts/InferenceDataFromHDDM.py /home/${NB_USER}/scripts
 COPY /tutorial/dockerHDDM_tutorial.ipynb /home/${NB_USER}/example
 COPY /tutorial/Run_all_models.py /home/${NB_USER}/example
 COPY /tutorial/Def_Models.py /home/${NB_USER}/example
-

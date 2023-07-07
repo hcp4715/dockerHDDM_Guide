@@ -1,0 +1,1 @@
+docker run --platform=linux/amd64 -it --rm -v /Volumes/T3/Dell5510/Exp_Modeling/DDM/dockerHDDM_guide:/home/jovyan/work -p 8888:8888 hcp4715/hddm:0.8_tutorial jupyter notebook
