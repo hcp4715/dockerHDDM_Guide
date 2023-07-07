@@ -6,7 +6,11 @@ Please read our preprint at: https://psyarxiv.com/6uzga/
 
 The docker image described by this tutorial can be found at: https://hub.docker.com/r/hcp4715/hddm, with tag `0.8_tutorial`.
 
-## Folder structure of the current repo
+## Repository Structure
+
+The Docker image comes with multiple Jupyter notebooks that provide a tutorial and examples on how to use HDDM. It also contains various scripts that could be useful for your analysis.
+
+This Docker image is set up to make it easy to use HDDM, especially for machines with aarch64 architecture (like M1 Chip Mac) which are not natively supported due to dependency on the deprecated version of PyMC (PyMC2).
 
 ```
 dockerHDDM_Guide
@@ -32,23 +36,24 @@ dockerHDDM_Guide
     |    figs
 ```
 
-## What is HDDM? 
-A python package for hierarchical drift-diffusion models.
+## Understanding HDDM
 
-### Scope of the current tutorial
+[HDDM](https://github.com/hddm-devs/hddm/) (Hierarchical Drift Diffusion Model) is a Python toolbox for hierarchical Bayesian parameter estimation of the Drift Diffusion Model, powered by PyMC. The Drift Diffusion Models are widely used in psychology and cognitive neuroscience to study decision making.
+
+## Scope of the current tutorial
 We limited our tutorial to classic functions in HDDM (version 0.8.0), instead of the latest version of HDDM (0.9.*). However, the docker images of more recent HDDM are available (https://hub.docker.com/r/hcp4715/hddm).
 
-## Three simple steps for using this guide
+## Quick Start Guide
 
-### Step 1: Install docker on your machine
+### Step 1: Docker Installation
 
 For Mac users, see [this](https://docs.docker.com/desktop/install/mac-install/) for installation and [this](https://docs.docker.com/desktop/mac/permission-requirements/) for permission requirements. 
 
-For windows users, see [this](https://docs.docker.com/desktop/install/windows-install/) for installation and [this](https://docs.docker.com/desktop/windows/permission-requirements/) for permission requirements.
+For Windows users, see [this](https://docs.docker.com/desktop/install/windows-install/) for installation and [this](https://docs.docker.com/desktop/windows/permission-requirements/) for permission requirements.
 
-For Linux users, you may only need the docker engine instead of docker desktop, see the differences [here](https://docs.docker.com/desktop/faqs/linuxfaqs/#what-is-the-difference-between-docker-desktop-for-linux-and-docker-engine). Please see [here](https://docs.docker.com/engine/install/) for installing docker engine in different distributions of Linux.
+For Linux users, you may only need the docker engine instead of the docker desktop, see the differences [here](https://docs.docker.com/desktop/faqs/linuxfaqs/#what-is-the-difference-between-docker-desktop-for-linux-and-docker-engine). Please see [here](https://docs.docker.com/engine/install/) for installing the docker engine in different distributions of Linux.
 
-** Plese verify docker desktop or docker engine is properly installed ** 
+** Please verify docker desktop or docker engine is properly installed ** 
 
 For Mac & Windows users, start docker desktop and then run `hello-world` images by the following code in your terminal or command line:
 
@@ -56,13 +61,15 @@ For Mac & Windows users, start docker desktop and then run `hello-world` images 
 
 This command downloads a test image and runs it in a container. When the container runs, it prints a confirmation message and exits.
 
-For linux users, verification of the installation is part of the instructions, which include code (for Ubuntu) like this:
+For Linux users, verification of the installation is part of the instructions, which include code (for Ubuntu) like this:
 
 `sudo docker run hello-world`
 
+If you want to run docker without `sudo`, please see [here](https://docs.docker.com/engine/install/linux-postinstall/).
+
 ### Step 2: Pull the `hddm:08_tutorial`
 
-Now that we successfully installed docker and can run docker in terminal or command line, we then pull the docker image for the current tutorial using the code below:
+Now that we successfully installed docker and can run docker in the terminal or command line, we then pull the docker image for the current tutorial using the code below:
 
 ```
 docker pull hcp4715/hddm:0.8_tutorial
@@ -74,23 +81,7 @@ Note that this is also part of our tutorial (see our preprint: https://psyarxiv.
 
 Now that we successfully pulled the docker image for the tutorial, we can use use the HDDM inside the docker by starting a container.
 
-#### For Mac users
-
-##### With Apple chips
-
-...
-
-##### With Intel chips
-
-...
-
-#### For Windows users
-
-...
-
-#### For Linux users
-
-run the code below in termial:
+Run the code below in the terminal:
 
 ```
 docker run -it --rm --cpus=5 \
@@ -116,9 +107,9 @@ docker run -it --rm --cpus=5 \
 
 `hcp4715/ddm:0.8_tutorial` ---- the docker image to run
 
-`jupyter notebook` ---- Open juypter notebook when start running the container.
+`jupyter notebook` ---- Open the juypter notebook when start running the container.
 
-After running the code above, bash will has output like this:
+After running the code above, bash will output like this:
 
 ```
 ....
@@ -137,17 +128,21 @@ Enter `example` folder, you can reproduce the analysis we presented in the tutor
 
 Enter `work` folder, you can analyze your own data stored in folder `/home/hcp4715/DDM/dockerHDDM_guide` with HDDM (version 0.8).
 
-## How this docker image was built
-An alternative way to get the docker image is to build it from `Dockerfile`.
+## Building the Docker Image
 
-I built this docker image under Ubuntu 20.04. 
+The Docker image is built from a Jupyter scipy-notebook base and comes with all necessary system and Python packages for running HDDM. The HDDM version can be specified during the build process using the build argument `HDDMVersion`. If no version is specified, it defaults to the v0.8.0 branch.
 
-Code for building the docker image (don't forget the `.` in the end):
+To build the Docker image, you can use the following command:
 
+```bash
+docker build --build-arg HDDMVersion=<version> -t hddm:<tag> .
 ```
-docker build -t hcp4715/hddm:0.8_tutorial -f Dockerfile .
-```
-You can replace `hcp4715` with your username in docker hub, and replace `hddm:0.8_tutorial` with a name and tag you prefer.
+
+Replace `<version>` with the HDDM version you want to install and `<tag>` with the tag you want to use for the Docker image.
 
 ## Acknowledgement
 Thank [@madslupe](https://github.com/madslupe) for his previous HDDM image, which laid the base for the current version. Thank [Dr Rui Yuan](https://scholar.google.com/citations?user=h8_wSLkAAAAJ&hl=en) for his help in creating the Dockerfile.
+
+## Contributing
+
+Contributions to improve this Docker image are welcome. If you find any issues or have suggestions, please open an issue in this repository.

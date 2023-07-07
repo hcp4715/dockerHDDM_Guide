@@ -1,0 +1,47 @@
+From 0924348823e63d3a589b478a8d4b7cb35ef363be Mon Sep 17 00:00:00 2001
+From: bef0rewind <ron.huafeng@gmail.com>
+Date: Fri, 7 Jul 2023 22:00:55 +0100
+Subject: [PATCH] fix build warnings and errors
+
+---
+ pymc/gibbsit.f | 3 ++-
+ setup.py       | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pymc/gibbsit.f b/pymc/gibbsit.f
+index f236fbdb..c8a7f63c 100644
+--- a/pymc/gibbsit.f
++++ b/pymc/gibbsit.f
+@@ -1174,6 +1174,7 @@ CF2PY THREADSAFE
+ 
+       double precision tmp1
+       double precision tmp2
++      double precision tmp3(iteracnt)
+ 
+       real      ppnd7
+ 
+@@ -1201,7 +1202,7 @@ CF2PY THREADSAFE
+ *                                                                      *
+ ************************************************************************
+ 
+-        cutpt = empquant(original,iteracnt,qhat,work)
++        cutpt = empquant(original,iteracnt,qhat,tmp3)
+ 
+ ************************************************************************
+ *                                                                      *
+diff --git a/setup.py b/setup.py
+index fa8e4d87..6d68769c 100755
+--- a/setup.py
++++ b/setup.py
+@@ -44,7 +44,7 @@ def build_ext(config):
+     f_sources = ['pymc/flib.f','pymc/histogram.f', 'pymc/flib_blas.f', 'pymc/blas_wrap.f', 'pymc/math.f', 'pymc/gibbsit.f', 'cephes/i0.c',
+                  'cephes/c2f.c','cephes/chbevl.c']
+     if lapack_info:
+-        config.add_extension(name='flib',sources=f_sources, extra_info=lapack_info, f2py_options=['skip:ppnd7'])
++        config.add_extension(name='flib',sources=f_sources, extra_info=lapack_info, f2py_options=['skip:', 'ppnd7', ':'])
+ 
+     if not lapack_info or dist in ['bdist', 'sdist']:
+         ##inc_dirs = ['blas/BLAS','lapack/double']
+-- 
+2.39.2 (Apple Git-143)
+

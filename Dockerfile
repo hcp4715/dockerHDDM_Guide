@@ -21,21 +21,26 @@ RUN buildDeps='gcc g++ gfortran' && \
 USER $NB_UID
 
 ARG HDDMVersion
-RUN pip install --no-cache-dir git+https://github.com/hcp4715/pymc2 && \
+# Install pymc2 and hddm. pymc2 is installed using a patch to fix build warnings and errors
+# Uninstall pymc 5 to avoid conflict with pymc2
+COPY /0001-fix-build.patch 001.patch
+RUN pip uninstall --no-cache-dir pymc -y && \
+    git clone https://github.com/pymc-devs/pymc2.git pymc2 &&  mv 001.patch pymc2 && \
+    cd pymc2 && \
+    git checkout 6b1b51ddea1a74c50d9a027741252b30810b29e0 && \
+    git apply 001.patch && \
+    pip install --no-cache-dir . && \
+    cd .. && rm -rf pymc2 && \
     pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki && \    
     pip install --no-cache-dir git+https://github.com/hddm-devs/hddm@${HDDMVersion} && \
     fix-permissions "/home/${NB_USER}"
 
 # Install other Python 3 packages
 RUN conda install -c conda-forge --quiet --yes \
-    'arviz=0.12.0' \
     'git' \
     'jupyter_bokeh' \
-    'python-graphviz' \
-    && \
+    'python-graphviz' && \
     conda clean --all -f -y && \
-    # uninstall pymc 5 to avoid conflict:
-    pip uninstall --no-cache-dir pymc -y && \
     pip install --upgrade pip && \
     pip install --no-cache-dir 'plotly==4.14.3' && \
     pip install --no-cache-dir 'cufflinks==0.17.3' && \
@@ -54,7 +59,7 @@ RUN conda install -c conda-forge --quiet --yes \
 ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" &&\
-    rm -r /home/$NB_USER/work && \
+    rm -r /home/${NB_USER}/work && \
     fix-permissions "/home/${NB_USER}"
 
 WORKDIR $HOME

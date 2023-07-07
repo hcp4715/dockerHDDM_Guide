@@ -8,6 +8,11 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        combo: 
+          - { hddmversion: '3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9', hddmtag: '0.8' }
+          - { hddmversion: 'v0.9.6', hddmtag: '0.9.6' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,7 +30,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: dockerfiles/Dockerfile
+          file: Dockerfile
           push: false
-          tags: hcp4715/hddm:0.8
+          build-args:
+            HDDMVersion=${{ matrix.combo.hddmversion }}  # pass the matrix value to Docker build arg
+          tags: hcp4715/hddm:${{ matrix.combo.hddmtag }}  # use the matrix value in the Docker tag
           platforms: linux/amd64,linux/arm64
