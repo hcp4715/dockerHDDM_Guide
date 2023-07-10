@@ -2,9 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 # This Dockerfile is for DDM tutorial
-# The buid from the base of minimal-notebook, based on python 3.8.8
- 
-ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8.8
+# The buid from the base of scipy-notebook, based on python 3.8
+
+ARG BASE_CONTAINER=jupyter/scipy-notebook:x86_64-python-3.8
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Hu Chuan-Peng <hcp4715@hotmail.com>"
@@ -13,6 +13,7 @@ USER root
 
 RUN apt-get update && \
     apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends build-essential && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt-get install -y --no-install-recommends ffmpeg dvipng && \
     rm -rf /var/lib/apt/lists/*
@@ -22,43 +23,8 @@ USER $NB_UID
 # Install Python 3 packages
 RUN conda install --quiet --yes \
     'arviz=0.12.0' \
-    'beautifulsoup4=4.9.*' \
-    'conda-forge::blas=*=openblas' \
-    'bokeh=2.4.*' \
-    'bottleneck=1.3.*' \
-    'cloudpickle=1.4.*' \
-    'cython=0.29.*' \
-    'dask=2.15.*' \
-    # dill must be 0.3.4
-    'dill=0.3.4' \
     'git' \
-    'h5py=2.10.*' \
-    'hdf5=1.10.*' \
-    'ipywidgets=7.6.*' \
-    'ipympl=0.8.*'\
     'jupyter_bokeh' \
-    'jupyterlab_widgets' \
-    'matplotlib-base=3.3.*' \
-    'mkl-service' \
-    'numba=0.54.*' \
-    'numexpr=2.7.*' \
-    'pandas=1.3.5' \
-    'patsy=0.5.*' \
-    'protobuf=3.11.*' \
-    'pytables=3.6.*' \
-    'scikit-image=0.16.*' \
-    'scikit-learn=0.22.*' \
-    'scipy=1.7.3' \
-    'seaborn=0.11.*' \
-    'sqlalchemy=1.3.*' \
-    'statsmodels=0.11.*' \
-    'sympy=1.5.*' \
-    'vincent=0.4.*' \
-    'widgetsnbextension=3.5.*'\
-    'xlrd=1.2.*' \
-    'xarray=0.19.0' \
-    # 'ipyparallel=6.3.0' \
-    'pymc=2.3.8' \
     && \
     conda clean --all -f -y && \
     fix-permissions "/home/${NB_USER}"
@@ -68,6 +34,10 @@ RUN conda install -c conda-forge --quiet --yes \
     'python-graphviz' \
     && \
     conda clean --all -f -y && \
+    fix-permissions "/home/${NB_USER}"
+
+# uinstall pymc 5 to avoid conflict:
+RUN pip uninstall --no-cache-dir pandas -y && \
     fix-permissions "/home/${NB_USER}"
 
 USER $NB_UID

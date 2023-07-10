@@ -29,8 +29,12 @@ __pycache__
 */*netcdf
 *chain*
 */*chain*
+*/*.db
 
 ## unpublished manuscript
 /manuscript
 *Swarag*
 *XiaTao*
+*pwk*
+*Untitled*
+*/test/

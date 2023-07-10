@@ -52,10 +52,12 @@ RUN conda install -c conda-forge --quiet --yes \
 
 # uinstall pymc 5 to avoid conflict:
 RUN pip uninstall --no-cache-dir pymc -y && \
+    pip uninstall --no-cache-dir pandas -y && \
     fix-permissions "/home/${NB_USER}"
 
 USER $NB_UID
 RUN pip install --upgrade pip && \
+    pip install --no-cache-dir 'pandas==2.0.1' && \
     pip install --no-cache-dir 'plotly==4.14.3' && \
     pip install --no-cache-dir 'cufflinks==0.17.3' && \
     # install ptitprince for raincloud plot in python
@@ -68,7 +70,8 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir 'pymc3==3.11.*' && \
     pip install --no-cache-dir 'bambi==0.8.*' && \
     pip install --no-cache-dir git+https://github.com/hcp4715/pymc2 &&\
-    pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki && \    
+    # pip install --no-cache-dir git+https://github.com/hddm-devs/kabuki  
+    pip install --no-cache-dir git+https://gitee.com/epool/kabuki.git && \ 
     pip install --no-cache-dir git+https://github.com/hddm-devs/hddm@3dcf4af58f2b7ce44c8b7e6a2afb21073d0a5ef9 && \
     fix-permissions "/home/${NB_USER}"
 

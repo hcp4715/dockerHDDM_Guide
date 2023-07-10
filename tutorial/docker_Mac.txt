@@ -1,1 +1,9 @@
-docker run --platform=linux/amd64 -it --rm -v /Volumes/T3/Dell5510/Exp_Modeling/DDM/dockerHDDM_guide:/home/jovyan/work -p 8888:8888 hcp4715/hddm:0.8_tutorial jupyter notebook
+##  for  amd64 image:
+docker run --platform=linux/amd64 -it --rm --cpus=5 -e GRANT_SUDO=yes \
+-v /Volumes/T3/Dell5510/Exp_Modeling/DDM/dockerHDDM_guide:/home/jovyan/work \
+-p 8888:8888 hcp4715/hddm:0.8_tutorial_amd64 jupyter notebook
+
+## for arm64 image:
+docker run -it --rm --cpus=5 -e GRANT_SUDO=yes \
+-v /Volumes/T3/Dell5510/Exp_Modeling/DDM/dockerHDDM_guide:/home/jovyan/work \
+-p 8888:8888 hcp4715/hddm:0.8_tutorial_arm64 jupyter notebook
