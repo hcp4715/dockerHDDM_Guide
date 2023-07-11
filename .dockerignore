@@ -7,5 +7,6 @@
 !/scripts/post_pred_gen_redefined.py
 !/scripts/InferenceDataFromHDDM.py
 !/tutorial/dockerHDDM_tutorial.ipynb
+!/tutorial/dockerHDDM_kabukiRC.ipynb
 !/tutorial/Run_all_models.py
 !/tutorial/Def_Models.py
