@@ -1,10 +1,10 @@
 # About this Repo
 
-This is a repo for preparing *A Hitchhiker’s Guide to Bayesian Hierarchical Drift-Diffusion Modeling with dockerHDDM* 
+This is an old repo for preparing *A Hitchhiker’s Guide to Bayesian Hierarchical Drift-Diffusion Modeling with dockerHDDM*. We are not going to update this repo. 
 
-Please read our preprint at: https://psyarxiv.com/6uzga/
+It corresponds to the v6 and older version of our [preprint](https://psyarxiv.com/6uzga/)
 
-The docker image described by this tutorial can be found at: https://hub.docker.com/r/hcp4715/hddm, with tag `0.8_tutorial`.
+Please see https://github.com/hcp4715/dockerHDDM for the latest progress of this tutorial and its related docker images.
 
 ## Folder structure of the current repo
 
